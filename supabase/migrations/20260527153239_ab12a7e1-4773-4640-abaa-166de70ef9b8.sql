@@ -1,0 +1,1 @@
+ALTER TABLE public.membros ADD COLUMN IF NOT EXISTS whatsapp text;
