@@ -7,6 +7,7 @@ type Plan = {
   badge?: string;
   priceMonthly: string;
   priceAnnual: string;
+  annualTotal: string;
   priceCustom?: boolean;
   seats: string;
   features: string[];
@@ -20,6 +21,7 @@ const plans: Plan[] = [
     name: "Grátis",
     priceMonthly: "0",
     priceAnnual: "0",
+    annualTotal: "0",
     seats: "Até 3 membros",
     features: [
       "Passagens de turno",
@@ -32,6 +34,7 @@ const plans: Plan[] = [
     name: "Básico",
     priceMonthly: "69",
     priceAnnual: "57",
+    annualTotal: "684",
     seats: "Até 8 membros",
     features: [
       "Tudo do Grátis +",
@@ -46,6 +49,7 @@ const plans: Plan[] = [
     badge: "Mais popular",
     priceMonthly: "159",
     priceAnnual: "132",
+    annualTotal: "1.584",
     seats: "Até 20 membros",
     features: [
       "Tudo do Básico +",
@@ -60,6 +64,7 @@ const plans: Plan[] = [
     name: "Profissional",
     priceMonthly: "289",
     priceAnnual: "240",
+    annualTotal: "2.880",
     seats: "Até 50 membros",
     features: [
       "Tudo do Equipe +",
@@ -75,6 +80,7 @@ const plans: Plan[] = [
     badge: "Enterprise",
     priceMonthly: "Sob",
     priceAnnual: "Sob",
+    annualTotal: "0",
     priceCustom: true,
     seats: "Acima de 50 membros",
     features: [
@@ -128,7 +134,10 @@ export function PricingSection() {
               />
             </button>
             <span className={`text-sm ${annual ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
-              Anual <span className="ml-1 rounded-full bg-turno-100 px-2 py-0.5 text-xs text-turno-700">-17%</span>
+              Anual{" "}
+              <span className="ml-1 rounded-full bg-turno-100 px-2 py-0.5 text-xs text-turno-700">
+                -17%
+              </span>
             </span>
           </div>
         </div>
@@ -151,6 +160,12 @@ export function PricingSection() {
                 </span>
               )}
 
+              {annual && !plan.enterprise && plan.priceMonthly !== "0" && (
+                <span className="absolute right-4 top-4 rounded-md bg-turno-50 px-2 py-1 text-[11px] font-medium text-turno-700">
+                  17% OFF
+                </span>
+              )}
+
               <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
 
               {plan.enterprise ? (
@@ -158,26 +173,36 @@ export function PricingSection() {
                   <span className="text-4xl font-semibold tracking-tight text-foreground">Sob</span>
                   <span className="text-sm text-muted-foreground">consulta</span>
                 </div>
-              ) : (
-                <div>
-                  <div className="mt-4 flex items-baseline gap-1">
-                    {plan.priceMonthly !== "0" && (
-                      <span className="text-sm font-medium text-foreground">R$</span>
-                    )}
-                    <span className="text-4xl font-semibold tracking-tight text-foreground">
-                      {annual ? plan.priceAnnual : plan.priceMonthly}
+              ) : plan.priceMonthly === "0" ? (
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-4xl font-semibold tracking-tight text-foreground">R$0</span>
+                  <span className="text-sm text-muted-foreground">/mês</span>
+                </div>
+              ) : annual ? (
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground">
+                    12x{" "}
+                    <span className="text-2xl font-semibold text-foreground">
+                      R${plan.priceAnnual}
                     </span>
-                    {plan.priceMonthly !== "0" && (
-                      <span className="text-sm text-muted-foreground">/mês</span>
-                    )}
+                    <span className="text-sm text-muted-foreground">/mês</span>
+                  </p>
+                  <p className="mt-1 text-xs text-turno-600">
+                    R${plan.annualTotal} valor à vista com desconto
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm font-medium text-foreground">R$</span>
+                    <span className="text-4xl font-semibold tracking-tight text-foreground">
+                      {plan.priceMonthly}
+                    </span>
+                    <span className="text-sm text-muted-foreground">/mês</span>
                   </div>
-                  {plan.priceMonthly !== "0" && (
-                    <p className="mt-1 text-xs text-turno-600">
-                      {annual
-                        ? `R$${Number(plan.priceAnnual) * 12} cobrado uma vez por ano`
-                        : `R$${plan.priceAnnual}/mês no plano anual`}
-                    </p>
-                  )}
+                  <p className="mt-1 text-xs text-turno-600">
+                    R${plan.priceAnnual}/mês no plano anual
+                  </p>
                 </div>
               )}
 
