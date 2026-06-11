@@ -7,7 +7,7 @@ type Plan = {
   badge?: string;
   priceMonthly: string;
   priceAnnual: string;
-  priceCustom?: string;
+  priceCustom?: boolean;
   seats: string;
   features: string[];
   cta: string;
@@ -22,32 +22,30 @@ const plans: Plan[] = [
     priceAnnual: "0",
     seats: "Até 3 membros",
     features: [
-      "Uso ilimitado no tempo",
       "Passagens de turno",
       "Histórico 7 dias",
-      "App mobile + painel web simples",
+      "App mobile + painel web",
     ],
     cta: "Começar grátis",
   },
   {
     name: "Básico",
-    priceMonthly: "99",
-    priceAnnual: "82",
+    priceMonthly: "69",
+    priceAnnual: "57",
     seats: "Até 8 membros",
     features: [
       "Tudo do Grátis +",
-      "Resumo com IA ao encerrar turno",
-      "Assinatura digital nas passagens",
+      "Resumo IA ao encerrar turno",
+      "Assinatura digital",
       "Histórico 90 dias",
-      "Suporte por e-mail (até 72h úteis)",
     ],
-    cta: "Testar grátis",
+    cta: "Testar 7 dias grátis",
   },
   {
     name: "Equipe",
     badge: "Mais popular",
-    priceMonthly: "220",
-    priceAnnual: "183",
+    priceMonthly: "159",
+    priceAnnual: "132",
     seats: "Até 20 membros",
     features: [
       "Tudo do Básico +",
@@ -55,45 +53,50 @@ const plans: Plan[] = [
       "Histórico 1 ano",
       "Notas privadas do gestor",
     ],
-    cta: "Testar grátis",
+    cta: "Testar 7 dias grátis",
     popular: true,
   },
   {
     name: "Profissional",
-    priceMonthly: "349",
-    priceAnnual: "290",
+    priceMonthly: "289",
+    priceAnnual: "240",
     seats: "Até 50 membros",
     features: [
       "Tudo do Equipe +",
-      "Multi-unidade (até 5, diluindo os 50 membros)",
+      "Multi-unidade (até 5)",
       "Exportação em PDF",
-      "Relatórios avançados + Chat IA 24/7",
+      "Relatórios avançados",
       "Histórico ilimitado",
-      "Suporte 24/7",
     ],
-    cta: "Testar grátis",
+    cta: "Testar 7 dias grátis",
   },
   {
     name: "Enterprise",
     badge: "Enterprise",
     priceMonthly: "Sob",
     priceAnnual: "Sob",
-    priceCustom: "consulta",
+    priceCustom: true,
     seats: "Acima de 50 membros",
     features: [
       "Tudo do Profissional +",
       "Multi-unidade ilimitada",
-      "SSO (login corporativo)",
+      "SSO corporativo",
       "Onboarding dedicado",
-      "SLA contratual + suporte direto",
+      "SLA contratual",
     ],
     cta: "Falar com a equipe",
     enterprise: true,
   },
 ];
 
+const annualDiscount: Record<string, string> = {
+  "69": "57",
+  "159": "132",
+  "289": "240",
+};
+
 export function PricingSection() {
-  const [annual, setAnnual] = useState(true);
+  const [annual, setAnnual] = useState(false);
 
   return (
     <section id="precos" className="w-full bg-background py-20 md:py-28">
@@ -106,7 +109,12 @@ export function PricingSection() {
             Para equipes de qualquer tamanho. Cancele quando quiser.
           </p>
 
-          <div className="mt-8 inline-flex items-center gap-3">
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-turno-200 bg-turno-50 px-4 py-2 text-sm text-turno-600">
+            <span className="h-2 w-2 rounded-full bg-turno-400" />
+            Chat IA incluído em todos os planos — dúvidas resolvidas na hora, sem esperar suporte
+          </div>
+
+          <div className="mt-6 inline-flex items-center gap-3">
             <span className={`text-sm ${!annual ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
               Mensal
             </span>
@@ -126,7 +134,7 @@ export function PricingSection() {
               />
             </button>
             <span className={`text-sm ${annual ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
-              Anual
+              Anual <span className="ml-1 rounded-full bg-turno-100 px-2 py-0.5 text-xs text-turno-700">-17%</span>
             </span>
           </div>
         </div>
@@ -157,14 +165,24 @@ export function PricingSection() {
                   <span className="text-sm text-muted-foreground">consulta</span>
                 </div>
               ) : (
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-sm font-medium text-foreground">R$</span>
-                  <span className="text-4xl font-semibold tracking-tight text-foreground">
-                    {annual ? plan.priceAnnual : plan.priceMonthly}
-                  </span>
-                  <span className="text-sm text-muted-foreground">/mês</span>
+                <div>
+                  <div className="mt-4 flex items-baseline gap-1">
+                    <span className="text-sm font-medium text-foreground">R$</span>
+                    <span className="text-4xl font-semibold tracking-tight text-foreground">
+                      {annual ? plan.priceAnnual : plan.priceMonthly}
+                    </span>
+                    <span className="text-sm text-muted-foreground">/mês</span>
+                  </div>
+                  {plan.priceMonthly !== "0" && (
+                    <p className="mt-1 text-xs text-turno-600">
+                      {annual
+                        ? "cobrado anualmente"
+                        : `R$${annualDiscount[plan.priceMonthly]}/mês no plano anual`}
+                    </p>
+                  )}
                 </div>
               )}
+
               <p className="mt-1 text-xs text-muted-foreground">{plan.seats}</p>
 
               <ul className="mt-6 flex flex-col gap-3">
@@ -178,7 +196,11 @@ export function PricingSection() {
 
               <Link
                 to={plan.enterprise ? "/contato" : "/login"}
-                className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                className={`mt-8 inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
+                  plan.popular
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "border border-border bg-background text-foreground hover:bg-muted"
+                }`}
               >
                 {plan.cta}
               </Link>
