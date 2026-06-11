@@ -3,10 +3,5 @@
   "name": "turno",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "src/server.ts",
-  "alias": {
-    "#tanstack-router-entry": "./.tanstack/router-entry.js",
-    "#tanstack-start-entry": "./.tanstack/start-entry.js",
-    "tanstack-start-manifest:v": "./.tanstack/manifest.js"
-  }
+  "main": "dist/server/server.js"
 }
