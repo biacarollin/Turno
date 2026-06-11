@@ -89,12 +89,6 @@ const plans: Plan[] = [
   },
 ];
 
-const annualDiscount: Record<string, string> = {
-  "69": "57",
-  "159": "132",
-  "289": "240",
-};
-
 export function PricingSection() {
   const [annual, setAnnual] = useState(false);
 
@@ -167,17 +161,21 @@ export function PricingSection() {
               ) : (
                 <div>
                   <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-sm font-medium text-foreground">R$</span>
+                    {plan.priceMonthly !== "0" && (
+                      <span className="text-sm font-medium text-foreground">R$</span>
+                    )}
                     <span className="text-4xl font-semibold tracking-tight text-foreground">
                       {annual ? plan.priceAnnual : plan.priceMonthly}
                     </span>
-                    <span className="text-sm text-muted-foreground">/mês</span>
+                    {plan.priceMonthly !== "0" && (
+                      <span className="text-sm text-muted-foreground">/mês</span>
+                    )}
                   </div>
                   {plan.priceMonthly !== "0" && (
                     <p className="mt-1 text-xs text-turno-600">
                       {annual
-                        ? "cobrado anualmente"
-                        : `R$${annualDiscount[plan.priceMonthly]}/mês no plano anual`}
+                        ? `R$${Number(plan.priceAnnual) * 12} cobrado uma vez por ano`
+                        : `R$${plan.priceAnnual}/mês no plano anual`}
                     </p>
                   )}
                 </div>
