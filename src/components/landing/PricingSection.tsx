@@ -7,8 +7,8 @@ type Plan = {
   badge?: string;
   priceMonthly: string;
   priceAnnual: string;
-  annualTotal: string;
-  priceCustom?: boolean;
+  priceAnnualFull: string;
+  annualEquivalent: string;
   seats: string;
   features: string[];
   cta: string;
@@ -21,7 +21,8 @@ const plans: Plan[] = [
     name: "Grátis",
     priceMonthly: "0",
     priceAnnual: "0",
-    annualTotal: "0",
+    priceAnnualFull: "0",
+    annualEquivalent: "0",
     seats: "Até 3 membros",
     features: [
       "Passagens de turno",
@@ -33,8 +34,9 @@ const plans: Plan[] = [
   {
     name: "Básico",
     priceMonthly: "69",
-    priceAnnual: "57",
-    annualTotal: "684",
+    priceAnnual: "684",
+    priceAnnualFull: "828",
+    annualEquivalent: "57",
     seats: "Até 8 membros",
     features: [
       "Tudo do Grátis +",
@@ -48,8 +50,9 @@ const plans: Plan[] = [
     name: "Equipe",
     badge: "Mais popular",
     priceMonthly: "159",
-    priceAnnual: "132",
-    annualTotal: "1.584",
+    priceAnnual: "1.584",
+    priceAnnualFull: "1.908",
+    annualEquivalent: "132",
     seats: "Até 20 membros",
     features: [
       "Tudo do Básico +",
@@ -63,8 +66,9 @@ const plans: Plan[] = [
   {
     name: "Profissional",
     priceMonthly: "289",
-    priceAnnual: "240",
-    annualTotal: "2.880",
+    priceAnnual: "2.880",
+    priceAnnualFull: "3.468",
+    annualEquivalent: "240",
     seats: "Até 50 membros",
     features: [
       "Tudo do Equipe +",
@@ -80,8 +84,8 @@ const plans: Plan[] = [
     badge: "Enterprise",
     priceMonthly: "Sob",
     priceAnnual: "Sob",
-    annualTotal: "0",
-    priceCustom: true,
+    priceAnnualFull: "0",
+    annualEquivalent: "0",
     seats: "Acima de 50 membros",
     features: [
       "Tudo do Profissional +",
@@ -111,7 +115,7 @@ export function PricingSection() {
 
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-turno-200 bg-turno-50 px-4 py-2 text-sm text-turno-600">
             <span className="h-2 w-2 rounded-full bg-turno-400" />
-            Chat IA incluído em todos os planos — dúvidas resolvidas na hora, sem esperar suporte
+            Chat IA incluído em todos os planos
           </div>
 
           <div className="mt-6 inline-flex items-center gap-3">
@@ -136,7 +140,7 @@ export function PricingSection() {
             <span className={`text-sm ${annual ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
               Anual{" "}
               <span className="ml-1 rounded-full bg-turno-100 px-2 py-0.5 text-xs text-turno-700">
-                -17%
+                17% OFF
               </span>
             </span>
           </div>
@@ -160,18 +164,11 @@ export function PricingSection() {
                 </span>
               )}
 
-              {annual && !plan.enterprise && plan.priceMonthly !== "0" && (
-                <span className="absolute right-4 top-4 rounded-md bg-turno-50 px-2 py-1 text-[11px] font-medium text-turno-700">
-                  17% OFF
-                </span>
-              )}
-
               <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
 
               {plan.enterprise ? (
-                <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-4xl font-semibold tracking-tight text-foreground">Sob</span>
-                  <span className="text-sm text-muted-foreground">consulta</span>
+                <div className="mt-4">
+                  <span className="text-2xl font-semibold text-foreground">Sob consulta</span>
                 </div>
               ) : plan.priceMonthly === "0" ? (
                 <div className="mt-4 flex items-baseline gap-1">
@@ -180,16 +177,20 @@ export function PricingSection() {
                 </div>
               ) : annual ? (
                 <div className="mt-4">
-                  <p className="text-sm text-muted-foreground">
-                    12x{" "}
-                    <span className="text-2xl font-semibold text-foreground">
-                      R${plan.priceAnnual}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm font-medium text-foreground">R$</span>
+                    <span className="text-4xl font-semibold tracking-tight text-foreground">
+                      {plan.priceAnnual}
                     </span>
-                    <span className="text-sm text-muted-foreground">/mês</span>
-                  </p>
+                    <span className="text-sm text-muted-foreground">/ano</span>
+                  </div>
                   <p className="mt-1 text-xs text-turno-600">
-                    R${plan.annualTotal} valor à vista com desconto
+                    <s className="text-muted-foreground opacity-60">R${plan.priceAnnualFull}</s>{" "}
+                    17% OFF
                   </p>
+                  <span className="mt-1 inline-block rounded-md bg-turno-50 px-2 py-0.5 text-[11px] text-turno-700">
+                    R${plan.annualEquivalent}/mês equivalente
+                  </span>
                 </div>
               ) : (
                 <div className="mt-4">
@@ -200,9 +201,7 @@ export function PricingSection() {
                     </span>
                     <span className="text-sm text-muted-foreground">/mês</span>
                   </div>
-                  <p className="mt-1 text-xs text-turno-600">
-                    R${plan.priceAnnual}/mês no plano anual
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Cancele quando quiser</p>
                 </div>
               )}
 
