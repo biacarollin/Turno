@@ -1,6 +1,7 @@
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { createCheckoutSession } from "@/lib/checkout.server";
 
 type Plan = {
   name: string;
@@ -14,6 +15,8 @@ type Plan = {
   cta: string;
   popular?: boolean;
   enterprise?: boolean;
+  priceKeyMonthly?: string;
+  priceKeyAnnual?: string;
 };
 
 const plans: Plan[] = [
@@ -45,6 +48,8 @@ const plans: Plan[] = [
       "Histórico 90 dias",
     ],
     cta: "Testar 7 dias grátis",
+    priceKeyMonthly: "basico_mensal",
+    priceKeyAnnual: "basico_anual",
   },
   {
     name: "Equipe",
@@ -62,6 +67,8 @@ const plans: Plan[] = [
     ],
     cta: "Testar 7 dias grátis",
     popular: true,
+    priceKeyMonthly: "equipe_mensal",
+    priceKeyAnnual: "equipe_anual",
   },
   {
     name: "Profissional",
@@ -78,6 +85,8 @@ const plans: Plan[] = [
       "Histórico ilimitado",
     ],
     cta: "Testar 7 dias grátis",
+    priceKeyMonthly: "profissional_mensal",
+    priceKeyAnnual: "profissional_anual",
   },
   {
     name: "Enterprise",
@@ -101,6 +110,26 @@ const plans: Plan[] = [
 
 export function PricingSection() {
   const [annual, setAnnual] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  async function handleCheckout(plan: Plan) {
+    const priceKey = annual ? plan.priceKeyAnnual : plan.priceKeyMonthly;
+    if (!priceKey) return;
+
+    setLoadingPlan(plan.name);
+    try {
+      const result = await createCheckoutSession({
+        data: { priceKey } as never,
+      });
+      if (result?.url) {
+        window.location.href = result.url;
+      }
+    } catch (err) {
+      console.error("Erro ao iniciar checkout:", err);
+    } finally {
+      setLoadingPlan(null);
+    }
+  }
 
   return (
     <section id="precos" className="w-full bg-background py-20 md:py-28">
@@ -216,16 +245,41 @@ export function PricingSection() {
                 ))}
               </ul>
 
-              <Link
-                to={plan.enterprise ? "/contato" : "/login"}
-                className={`mt-8 inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-medium transition-colors ${
-                  plan.popular
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "border border-border bg-background text-foreground hover:bg-muted"
-                }`}
-              >
-                {plan.cta}
-              </Link>
+              {plan.enterprise ? (
+                <Link
+                  to="/contato"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  {plan.cta}
+                </Link>
+              ) : plan.priceMonthly === "0" ? (
+                <Link
+                  to="/login"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  {plan.cta}
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleCheckout(plan)}
+                  disabled={loadingPlan === plan.name}
+                  className={`mt-8 inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                    plan.popular
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "border border-border bg-background text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {loadingPlan === plan.name ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Aguarde...
+                    </>
+                  ) : (
+                    plan.cta
+                  )}
+                </button>
+              )}
             </div>
           ))}
         </div>
