@@ -1,7 +1,7 @@
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { createCheckoutSession } from "@/lib/checkout.server";
+import { createCheckoutSession } from "@/lib/checkout";
 
 type Plan = {
   name: string;

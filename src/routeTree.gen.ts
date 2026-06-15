@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestCheckoutRouteImport } from './routes/test-checkout'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as SuporteRouteImport } from './routes/suporte'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
@@ -29,7 +30,13 @@ import { Route as AppHistoricoRouteImport } from './routes/app.historico'
 import { Route as AppFolgasRouteImport } from './routes/app.folgas'
 import { Route as AppConfiguracoesRouteImport } from './routes/app.configuracoes'
 import { Route as AppCargosRouteImport } from './routes/app.cargos'
+import { Route as ApiWebhooksStripeRouteImport } from './routes/api.webhooks.stripe'
 
+const TestCheckoutRoute = TestCheckoutRouteImport.update({
+  id: '/test-checkout',
+  path: '/test-checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermosRoute = TermosRouteImport.update({
   id: '/termos',
   path: '/termos',
@@ -130,6 +137,11 @@ const AppCargosRoute = AppCargosRouteImport.update({
   path: '/cargos',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
+  id: '/api/webhooks/stripe',
+  path: '/api/webhooks/stripe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -142,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
+  '/test-checkout': typeof TestCheckoutRoute
   '/app/cargos': typeof AppCargosRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/folgas': typeof AppFolgasRoute
@@ -152,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/app/plano': typeof AppPlanoRoute
   '/app/turnos': typeof AppTurnosRoute
   '/app/': typeof AppIndexRoute
+  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -163,6 +177,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
+  '/test-checkout': typeof TestCheckoutRoute
   '/app/cargos': typeof AppCargosRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/folgas': typeof AppFolgasRoute
@@ -173,6 +188,7 @@ export interface FileRoutesByTo {
   '/app/plano': typeof AppPlanoRoute
   '/app/turnos': typeof AppTurnosRoute
   '/app': typeof AppIndexRoute
+  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -186,6 +202,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/suporte': typeof SuporteRoute
   '/termos': typeof TermosRoute
+  '/test-checkout': typeof TestCheckoutRoute
   '/app/cargos': typeof AppCargosRoute
   '/app/configuracoes': typeof AppConfiguracoesRoute
   '/app/folgas': typeof AppFolgasRoute
@@ -196,6 +213,7 @@ export interface FileRoutesById {
   '/app/plano': typeof AppPlanoRoute
   '/app/turnos': typeof AppTurnosRoute
   '/app/': typeof AppIndexRoute
+  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,6 +228,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/suporte'
     | '/termos'
+    | '/test-checkout'
     | '/app/cargos'
     | '/app/configuracoes'
     | '/app/folgas'
@@ -220,6 +239,7 @@ export interface FileRouteTypes {
     | '/app/plano'
     | '/app/turnos'
     | '/app/'
+    | '/api/webhooks/stripe'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -231,6 +251,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/suporte'
     | '/termos'
+    | '/test-checkout'
     | '/app/cargos'
     | '/app/configuracoes'
     | '/app/folgas'
@@ -241,6 +262,7 @@ export interface FileRouteTypes {
     | '/app/plano'
     | '/app/turnos'
     | '/app'
+    | '/api/webhooks/stripe'
   id:
     | '__root__'
     | '/'
@@ -253,6 +275,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/suporte'
     | '/termos'
+    | '/test-checkout'
     | '/app/cargos'
     | '/app/configuracoes'
     | '/app/folgas'
@@ -263,6 +286,7 @@ export interface FileRouteTypes {
     | '/app/plano'
     | '/app/turnos'
     | '/app/'
+    | '/api/webhooks/stripe'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -276,10 +300,19 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   SuporteRoute: typeof SuporteRoute
   TermosRoute: typeof TermosRoute
+  TestCheckoutRoute: typeof TestCheckoutRoute
+  ApiWebhooksStripeRoute: typeof ApiWebhooksStripeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test-checkout': {
+      id: '/test-checkout'
+      path: '/test-checkout'
+      fullPath: '/test-checkout'
+      preLoaderRoute: typeof TestCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/termos': {
       id: '/termos'
       path: '/termos'
@@ -420,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCargosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/webhooks/stripe': {
+      id: '/api/webhooks/stripe'
+      path: '/api/webhooks/stripe'
+      fullPath: '/api/webhooks/stripe'
+      preLoaderRoute: typeof ApiWebhooksStripeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -462,6 +502,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   SuporteRoute: SuporteRoute,
   TermosRoute: TermosRoute,
+  TestCheckoutRoute: TestCheckoutRoute,
+  ApiWebhooksStripeRoute: ApiWebhooksStripeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
