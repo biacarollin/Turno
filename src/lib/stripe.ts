@@ -1,12 +1,8 @@
 import { loadStripe } from "@stripe/stripe-js";
 
-const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-
-if (!stripePublishableKey) {
-  throw new Error("VITE_STRIPE_PUBLISHABLE_KEY não definida");
-}
-
-export const stripePromise = loadStripe(stripePublishableKey);
+export const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? ""
+);
 
 export const PLANS = {
   basico: {

@@ -31,8 +31,8 @@ export const PLANOS: Array<{
   {
     id: "basico",
     nome: "Básico",
-    preco: "R$ 99/mês",
-    precoNumero: 99,
+    preco: "R$ 69/mês",
+    precoNumero: 69,
     membros: "Até 8 membros",
     beneficios: [
       "Tudo do Grátis +",
@@ -45,8 +45,8 @@ export const PLANOS: Array<{
   {
     id: "equipe",
     nome: "Equipe",
-    preco: "R$ 220/mês",
-    precoNumero: 220,
+    preco: "R$ 159/mês",
+    precoNumero: 159,
     membros: "Até 20 membros",
     destaque: true,
     beneficios: [
@@ -59,8 +59,8 @@ export const PLANOS: Array<{
   {
     id: "profissional",
     nome: "Profissional",
-    preco: "R$ 349/mês",
-    precoNumero: 349,
+    preco: "R$ 289/mês",
+    precoNumero: 289,
     membros: "Até 50 membros",
     beneficios: [
       "Tudo do Equipe +",
