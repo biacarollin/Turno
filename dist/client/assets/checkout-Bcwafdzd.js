@@ -1,0 +1,1 @@
+import{c as e,r}from"./auth-middleware-UBAb15f3.js";import{g as a}from"./index-CKwF94do.js";const c=e({method:"POST"}).middleware([r]).handler(a("93a804ab06e45560dbb0c5e1f040dd61608b70d51751ea73b7cd35e81d73536d"));export{c};
