@@ -1,5 +1,5 @@
 import { EventEmitter } from "node:events";
-const hrtime$4 = /* @__PURE__ */ Object.assign(function hrtime(startTime) {
+const hrtime$5 = /* @__PURE__ */ Object.assign(function hrtime(startTime) {
   const now = Date.now();
   const seconds = Math.trunc(now / 1e3);
   const nanos = now % 1e3 * 1e6;
@@ -16,7 +16,785 @@ const hrtime$4 = /* @__PURE__ */ Object.assign(function hrtime(startTime) {
 }, { bigint: function bigint() {
   return BigInt(Date.now() * 1e6);
 } });
-let ReadStream$2 = class ReadStream {
+class ReadStream {
+  fd;
+  isRaw = false;
+  isTTY = false;
+  constructor(fd) {
+    this.fd = fd;
+  }
+  setRawMode(mode) {
+    this.isRaw = mode;
+    return this;
+  }
+}
+class WriteStream {
+  fd;
+  columns = 80;
+  rows = 24;
+  isTTY = false;
+  constructor(fd) {
+    this.fd = fd;
+  }
+  clearLine(dir, callback) {
+    callback && callback();
+    return false;
+  }
+  clearScreenDown(callback) {
+    callback && callback();
+    return false;
+  }
+  cursorTo(x, y, callback) {
+    callback && typeof callback === "function" && callback();
+    return false;
+  }
+  moveCursor(dx, dy, callback) {
+    callback && callback();
+    return false;
+  }
+  getColorDepth(env2) {
+    return 1;
+  }
+  hasColors(count, env2) {
+    return false;
+  }
+  getWindowSize() {
+    return [this.columns, this.rows];
+  }
+  write(str, encoding, cb) {
+    if (str instanceof Uint8Array) {
+      str = new TextDecoder().decode(str);
+    }
+    try {
+      console.log(str);
+    } catch {
+    }
+    cb && typeof cb === "function" && cb();
+    return false;
+  }
+}
+// @__NO_SIDE_EFFECTS__
+function createNotImplementedError$4(name) {
+  return new Error(`[unenv] ${name} is not implemented yet!`);
+}
+// @__NO_SIDE_EFFECTS__
+function notImplemented$4(name) {
+  const fn = () => {
+    throw /* @__PURE__ */ createNotImplementedError$4(name);
+  };
+  return Object.assign(fn, { __unenv__: true });
+}
+const NODE_VERSION$4 = "22.14.0";
+class Process extends EventEmitter {
+  env;
+  hrtime;
+  nextTick;
+  constructor(impl) {
+    super();
+    this.env = impl.env;
+    this.hrtime = impl.hrtime;
+    this.nextTick = impl.nextTick;
+    for (const prop of [...Object.getOwnPropertyNames(Process.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
+      const value = this[prop];
+      if (typeof value === "function") {
+        this[prop] = value.bind(this);
+      }
+    }
+  }
+  // --- event emitter ---
+  emitWarning(warning, type, code) {
+    console.warn(`${code ? `[${code}] ` : ""}${type ? `${type}: ` : ""}${warning}`);
+  }
+  emit(...args) {
+    return super.emit(...args);
+  }
+  listeners(eventName) {
+    return super.listeners(eventName);
+  }
+  // --- stdio (lazy initializers) ---
+  #stdin;
+  #stdout;
+  #stderr;
+  get stdin() {
+    return this.#stdin ??= new ReadStream(0);
+  }
+  get stdout() {
+    return this.#stdout ??= new WriteStream(1);
+  }
+  get stderr() {
+    return this.#stderr ??= new WriteStream(2);
+  }
+  // --- cwd ---
+  #cwd = "/";
+  chdir(cwd2) {
+    this.#cwd = cwd2;
+  }
+  cwd() {
+    return this.#cwd;
+  }
+  // --- dummy props and getters ---
+  arch = "";
+  platform = "";
+  argv = [];
+  argv0 = "";
+  execArgv = [];
+  execPath = "";
+  title = "";
+  pid = 200;
+  ppid = 100;
+  get version() {
+    return `v${NODE_VERSION$4}`;
+  }
+  get versions() {
+    return { node: NODE_VERSION$4 };
+  }
+  get allowedNodeEnvironmentFlags() {
+    return /* @__PURE__ */ new Set();
+  }
+  get sourceMapsEnabled() {
+    return false;
+  }
+  get debugPort() {
+    return 0;
+  }
+  get throwDeprecation() {
+    return false;
+  }
+  get traceDeprecation() {
+    return false;
+  }
+  get features() {
+    return {};
+  }
+  get release() {
+    return {};
+  }
+  get connected() {
+    return false;
+  }
+  get config() {
+    return {};
+  }
+  get moduleLoadList() {
+    return [];
+  }
+  constrainedMemory() {
+    return 0;
+  }
+  availableMemory() {
+    return 0;
+  }
+  uptime() {
+    return 0;
+  }
+  resourceUsage() {
+    return {};
+  }
+  // --- noop methods ---
+  ref() {
+  }
+  unref() {
+  }
+  // --- unimplemented methods ---
+  umask() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.umask");
+  }
+  getBuiltinModule() {
+    return void 0;
+  }
+  getActiveResourcesInfo() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.getActiveResourcesInfo");
+  }
+  exit() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.exit");
+  }
+  reallyExit() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.reallyExit");
+  }
+  kill() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.kill");
+  }
+  abort() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.abort");
+  }
+  dlopen() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.dlopen");
+  }
+  setSourceMapsEnabled() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.setSourceMapsEnabled");
+  }
+  loadEnvFile() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.loadEnvFile");
+  }
+  disconnect() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.disconnect");
+  }
+  cpuUsage() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.cpuUsage");
+  }
+  setUncaughtExceptionCaptureCallback() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.setUncaughtExceptionCaptureCallback");
+  }
+  hasUncaughtExceptionCaptureCallback() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.hasUncaughtExceptionCaptureCallback");
+  }
+  initgroups() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.initgroups");
+  }
+  openStdin() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.openStdin");
+  }
+  assert() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.assert");
+  }
+  binding() {
+    throw /* @__PURE__ */ createNotImplementedError$4("process.binding");
+  }
+  // --- attached interfaces ---
+  permission = { has: /* @__PURE__ */ notImplemented$4("process.permission.has") };
+  report = {
+    directory: "",
+    filename: "",
+    signal: "SIGUSR2",
+    compact: false,
+    reportOnFatalError: false,
+    reportOnSignal: false,
+    reportOnUncaughtException: false,
+    getReport: /* @__PURE__ */ notImplemented$4("process.report.getReport"),
+    writeReport: /* @__PURE__ */ notImplemented$4("process.report.writeReport")
+  };
+  finalization = {
+    register: /* @__PURE__ */ notImplemented$4("process.finalization.register"),
+    unregister: /* @__PURE__ */ notImplemented$4("process.finalization.unregister"),
+    registerBeforeExit: /* @__PURE__ */ notImplemented$4("process.finalization.registerBeforeExit")
+  };
+  memoryUsage = Object.assign(() => ({
+    arrayBuffers: 0,
+    rss: 0,
+    external: 0,
+    heapTotal: 0,
+    heapUsed: 0
+  }), { rss: () => 0 });
+  // --- undefined props ---
+  mainModule = void 0;
+  domain = void 0;
+  // optional
+  send = void 0;
+  exitCode = void 0;
+  channel = void 0;
+  getegid = void 0;
+  geteuid = void 0;
+  getgid = void 0;
+  getgroups = void 0;
+  getuid = void 0;
+  setegid = void 0;
+  seteuid = void 0;
+  setgid = void 0;
+  setgroups = void 0;
+  setuid = void 0;
+  // internals
+  _events = void 0;
+  _eventsCount = void 0;
+  _exiting = void 0;
+  _maxListeners = void 0;
+  _debugEnd = void 0;
+  _debugProcess = void 0;
+  _fatalException = void 0;
+  _getActiveHandles = void 0;
+  _getActiveRequests = void 0;
+  _kill = void 0;
+  _preload_modules = void 0;
+  _rawDebug = void 0;
+  _startProfilerIdleNotifier = void 0;
+  _stopProfilerIdleNotifier = void 0;
+  _tickCallback = void 0;
+  _disconnect = void 0;
+  _handleQueue = void 0;
+  _pendingMessage = void 0;
+  _channel = void 0;
+  _send = void 0;
+  _linkedBinding = void 0;
+}
+const globalProcess$4 = globalThis["process"];
+const getBuiltinModule$4 = globalProcess$4.getBuiltinModule;
+const workerdProcess$4 = getBuiltinModule$4("node:process");
+const unenvProcess$4 = new Process({
+  env: globalProcess$4.env,
+  hrtime: hrtime$5,
+  // `nextTick` is available from workerd process v1
+  nextTick: workerdProcess$4.nextTick
+});
+const { exit: exit$4, features: features$4, platform: platform$4 } = workerdProcess$4;
+const {
+  _channel: _channel$4,
+  _debugEnd: _debugEnd$4,
+  _debugProcess: _debugProcess$4,
+  _disconnect: _disconnect$4,
+  _events: _events$4,
+  _eventsCount: _eventsCount$4,
+  _exiting: _exiting$4,
+  _fatalException: _fatalException$4,
+  _getActiveHandles: _getActiveHandles$4,
+  _getActiveRequests: _getActiveRequests$4,
+  _handleQueue: _handleQueue$4,
+  _kill: _kill$4,
+  _linkedBinding: _linkedBinding$4,
+  _maxListeners: _maxListeners$4,
+  _pendingMessage: _pendingMessage$4,
+  _preload_modules: _preload_modules$4,
+  _rawDebug: _rawDebug$4,
+  _send: _send$4,
+  _startProfilerIdleNotifier: _startProfilerIdleNotifier$4,
+  _stopProfilerIdleNotifier: _stopProfilerIdleNotifier$4,
+  _tickCallback: _tickCallback$4,
+  abort: abort$4,
+  addListener: addListener$4,
+  allowedNodeEnvironmentFlags: allowedNodeEnvironmentFlags$4,
+  arch: arch$4,
+  argv: argv$4,
+  argv0: argv0$4,
+  assert: assert$4,
+  availableMemory: availableMemory$4,
+  binding: binding$4,
+  channel: channel$4,
+  chdir: chdir$4,
+  config: config$4,
+  connected: connected$4,
+  constrainedMemory: constrainedMemory$4,
+  cpuUsage: cpuUsage$4,
+  cwd: cwd$4,
+  debugPort: debugPort$4,
+  disconnect: disconnect$4,
+  dlopen: dlopen$4,
+  domain: domain$4,
+  emit: emit$4,
+  emitWarning: emitWarning$4,
+  env: env$4,
+  eventNames: eventNames$4,
+  execArgv: execArgv$4,
+  execPath: execPath$4,
+  exitCode: exitCode$4,
+  finalization: finalization$4,
+  getActiveResourcesInfo: getActiveResourcesInfo$4,
+  getegid: getegid$4,
+  geteuid: geteuid$4,
+  getgid: getgid$4,
+  getgroups: getgroups$4,
+  getMaxListeners: getMaxListeners$4,
+  getuid: getuid$4,
+  hasUncaughtExceptionCaptureCallback: hasUncaughtExceptionCaptureCallback$4,
+  hrtime: hrtime2,
+  initgroups: initgroups$4,
+  kill: kill$4,
+  listenerCount: listenerCount$4,
+  listeners: listeners$4,
+  loadEnvFile: loadEnvFile$4,
+  mainModule: mainModule$4,
+  memoryUsage: memoryUsage$4,
+  moduleLoadList: moduleLoadList$4,
+  nextTick: nextTick$4,
+  off: off$4,
+  on: on$4,
+  once: once$4,
+  openStdin: openStdin$4,
+  permission: permission$4,
+  pid: pid$4,
+  ppid: ppid$4,
+  prependListener: prependListener$4,
+  prependOnceListener: prependOnceListener$4,
+  rawListeners: rawListeners$4,
+  reallyExit: reallyExit$4,
+  ref: ref$4,
+  release: release$4,
+  removeAllListeners: removeAllListeners$4,
+  removeListener: removeListener$4,
+  report: report$4,
+  resourceUsage: resourceUsage$4,
+  send: send$4,
+  setegid: setegid$4,
+  seteuid: seteuid$4,
+  setgid: setgid$4,
+  setgroups: setgroups$4,
+  setMaxListeners: setMaxListeners$4,
+  setSourceMapsEnabled: setSourceMapsEnabled$4,
+  setuid: setuid$4,
+  setUncaughtExceptionCaptureCallback: setUncaughtExceptionCaptureCallback$4,
+  sourceMapsEnabled: sourceMapsEnabled$4,
+  stderr: stderr$4,
+  stdin: stdin$4,
+  stdout: stdout$4,
+  throwDeprecation: throwDeprecation$4,
+  title: title$4,
+  traceDeprecation: traceDeprecation$4,
+  umask: umask$4,
+  unref: unref$4,
+  uptime: uptime$4,
+  version: version$4,
+  versions: versions$4
+} = unenvProcess$4;
+const _process$4 = {
+  abort: abort$4,
+  addListener: addListener$4,
+  allowedNodeEnvironmentFlags: allowedNodeEnvironmentFlags$4,
+  hasUncaughtExceptionCaptureCallback: hasUncaughtExceptionCaptureCallback$4,
+  setUncaughtExceptionCaptureCallback: setUncaughtExceptionCaptureCallback$4,
+  loadEnvFile: loadEnvFile$4,
+  sourceMapsEnabled: sourceMapsEnabled$4,
+  arch: arch$4,
+  argv: argv$4,
+  argv0: argv0$4,
+  chdir: chdir$4,
+  config: config$4,
+  connected: connected$4,
+  constrainedMemory: constrainedMemory$4,
+  availableMemory: availableMemory$4,
+  cpuUsage: cpuUsage$4,
+  cwd: cwd$4,
+  debugPort: debugPort$4,
+  dlopen: dlopen$4,
+  disconnect: disconnect$4,
+  emit: emit$4,
+  emitWarning: emitWarning$4,
+  env: env$4,
+  eventNames: eventNames$4,
+  execArgv: execArgv$4,
+  execPath: execPath$4,
+  exit: exit$4,
+  finalization: finalization$4,
+  features: features$4,
+  getBuiltinModule: getBuiltinModule$4,
+  getActiveResourcesInfo: getActiveResourcesInfo$4,
+  getMaxListeners: getMaxListeners$4,
+  hrtime: hrtime2,
+  kill: kill$4,
+  listeners: listeners$4,
+  listenerCount: listenerCount$4,
+  memoryUsage: memoryUsage$4,
+  nextTick: nextTick$4,
+  on: on$4,
+  off: off$4,
+  once: once$4,
+  pid: pid$4,
+  platform: platform$4,
+  ppid: ppid$4,
+  prependListener: prependListener$4,
+  prependOnceListener: prependOnceListener$4,
+  rawListeners: rawListeners$4,
+  release: release$4,
+  removeAllListeners: removeAllListeners$4,
+  removeListener: removeListener$4,
+  report: report$4,
+  resourceUsage: resourceUsage$4,
+  setMaxListeners: setMaxListeners$4,
+  setSourceMapsEnabled: setSourceMapsEnabled$4,
+  stderr: stderr$4,
+  stdin: stdin$4,
+  stdout: stdout$4,
+  title: title$4,
+  throwDeprecation: throwDeprecation$4,
+  traceDeprecation: traceDeprecation$4,
+  umask: umask$4,
+  uptime: uptime$4,
+  version: version$4,
+  versions: versions$4,
+  // @ts-expect-error old API
+  domain: domain$4,
+  initgroups: initgroups$4,
+  moduleLoadList: moduleLoadList$4,
+  reallyExit: reallyExit$4,
+  openStdin: openStdin$4,
+  assert: assert$4,
+  binding: binding$4,
+  send: send$4,
+  exitCode: exitCode$4,
+  channel: channel$4,
+  getegid: getegid$4,
+  geteuid: geteuid$4,
+  getgid: getgid$4,
+  getgroups: getgroups$4,
+  getuid: getuid$4,
+  setegid: setegid$4,
+  seteuid: seteuid$4,
+  setgid: setgid$4,
+  setgroups: setgroups$4,
+  setuid: setuid$4,
+  permission: permission$4,
+  mainModule: mainModule$4,
+  _events: _events$4,
+  _eventsCount: _eventsCount$4,
+  _exiting: _exiting$4,
+  _maxListeners: _maxListeners$4,
+  _debugEnd: _debugEnd$4,
+  _debugProcess: _debugProcess$4,
+  _fatalException: _fatalException$4,
+  _getActiveHandles: _getActiveHandles$4,
+  _getActiveRequests: _getActiveRequests$4,
+  _kill: _kill$4,
+  _preload_modules: _preload_modules$4,
+  _rawDebug: _rawDebug$4,
+  _startProfilerIdleNotifier: _startProfilerIdleNotifier$4,
+  _stopProfilerIdleNotifier: _stopProfilerIdleNotifier$4,
+  _tickCallback: _tickCallback$4,
+  _disconnect: _disconnect$4,
+  _handleQueue: _handleQueue$4,
+  _pendingMessage: _pendingMessage$4,
+  _channel: _channel$4,
+  _send: _send$4,
+  _linkedBinding: _linkedBinding$4
+};
+globalThis.process = _process$4;
+const _timeOrigin$4 = globalThis.performance?.timeOrigin ?? Date.now();
+const _performanceNow$4 = globalThis.performance?.now ? globalThis.performance.now.bind(globalThis.performance) : () => Date.now() - _timeOrigin$4;
+const nodeTiming$4 = {
+  name: "node",
+  entryType: "node",
+  startTime: 0,
+  duration: 0,
+  nodeStart: 0,
+  v8Start: 0,
+  bootstrapComplete: 0,
+  environment: 0,
+  loopStart: 0,
+  loopExit: 0,
+  idleTime: 0,
+  uvMetricsInfo: {
+    loopCount: 0,
+    events: 0,
+    eventsWaiting: 0
+  },
+  detail: void 0,
+  toJSON() {
+    return this;
+  }
+};
+class PerformanceEntry {
+  __unenv__ = true;
+  detail;
+  entryType = "event";
+  name;
+  startTime;
+  constructor(name, options) {
+    this.name = name;
+    this.startTime = options?.startTime || _performanceNow$4();
+    this.detail = options?.detail;
+  }
+  get duration() {
+    return _performanceNow$4() - this.startTime;
+  }
+  toJSON() {
+    return {
+      name: this.name,
+      entryType: this.entryType,
+      startTime: this.startTime,
+      duration: this.duration,
+      detail: this.detail
+    };
+  }
+}
+const PerformanceMark = class PerformanceMark2 extends PerformanceEntry {
+  entryType = "mark";
+  constructor() {
+    super(...arguments);
+  }
+  get duration() {
+    return 0;
+  }
+};
+class PerformanceMeasure extends PerformanceEntry {
+  entryType = "measure";
+}
+class PerformanceResourceTiming extends PerformanceEntry {
+  entryType = "resource";
+  serverTiming = [];
+  connectEnd = 0;
+  connectStart = 0;
+  decodedBodySize = 0;
+  domainLookupEnd = 0;
+  domainLookupStart = 0;
+  encodedBodySize = 0;
+  fetchStart = 0;
+  initiatorType = "";
+  name = "";
+  nextHopProtocol = "";
+  redirectEnd = 0;
+  redirectStart = 0;
+  requestStart = 0;
+  responseEnd = 0;
+  responseStart = 0;
+  secureConnectionStart = 0;
+  startTime = 0;
+  transferSize = 0;
+  workerStart = 0;
+  responseStatus = 0;
+}
+class PerformanceObserverEntryList {
+  __unenv__ = true;
+  getEntries() {
+    return [];
+  }
+  getEntriesByName(_name, _type) {
+    return [];
+  }
+  getEntriesByType(type) {
+    return [];
+  }
+}
+class Performance {
+  __unenv__ = true;
+  timeOrigin = _timeOrigin$4;
+  eventCounts = /* @__PURE__ */ new Map();
+  _entries = [];
+  _resourceTimingBufferSize = 0;
+  navigation = void 0;
+  timing = void 0;
+  timerify(_fn, _options) {
+    throw /* @__PURE__ */ createNotImplementedError$4("Performance.timerify");
+  }
+  get nodeTiming() {
+    return nodeTiming$4;
+  }
+  eventLoopUtilization() {
+    return {};
+  }
+  markResourceTiming() {
+    return new PerformanceResourceTiming("");
+  }
+  onresourcetimingbufferfull = null;
+  now() {
+    if (this.timeOrigin === _timeOrigin$4) {
+      return _performanceNow$4();
+    }
+    return Date.now() - this.timeOrigin;
+  }
+  clearMarks(markName) {
+    this._entries = markName ? this._entries.filter((e) => e.name !== markName) : this._entries.filter((e) => e.entryType !== "mark");
+  }
+  clearMeasures(measureName) {
+    this._entries = measureName ? this._entries.filter((e) => e.name !== measureName) : this._entries.filter((e) => e.entryType !== "measure");
+  }
+  clearResourceTimings() {
+    this._entries = this._entries.filter((e) => e.entryType !== "resource" || e.entryType !== "navigation");
+  }
+  getEntries() {
+    return this._entries;
+  }
+  getEntriesByName(name, type) {
+    return this._entries.filter((e) => e.name === name && (!type || e.entryType === type));
+  }
+  getEntriesByType(type) {
+    return this._entries.filter((e) => e.entryType === type);
+  }
+  mark(name, options) {
+    const entry = new PerformanceMark(name, options);
+    this._entries.push(entry);
+    return entry;
+  }
+  measure(measureName, startOrMeasureOptions, endMark) {
+    let start;
+    let end;
+    if (typeof startOrMeasureOptions === "string") {
+      start = this.getEntriesByName(startOrMeasureOptions, "mark")[0]?.startTime;
+      end = this.getEntriesByName(endMark, "mark")[0]?.startTime;
+    } else {
+      start = Number.parseFloat(startOrMeasureOptions?.start) || this.now();
+      end = Number.parseFloat(startOrMeasureOptions?.end) || this.now();
+    }
+    const entry = new PerformanceMeasure(measureName, {
+      startTime: start,
+      detail: {
+        start,
+        end
+      }
+    });
+    this._entries.push(entry);
+    return entry;
+  }
+  setResourceTimingBufferSize(maxSize) {
+    this._resourceTimingBufferSize = maxSize;
+  }
+  addEventListener(type, listener, options) {
+    throw /* @__PURE__ */ createNotImplementedError$4("Performance.addEventListener");
+  }
+  removeEventListener(type, listener, options) {
+    throw /* @__PURE__ */ createNotImplementedError$4("Performance.removeEventListener");
+  }
+  dispatchEvent(event) {
+    throw /* @__PURE__ */ createNotImplementedError$4("Performance.dispatchEvent");
+  }
+  toJSON() {
+    return this;
+  }
+}
+class PerformanceObserver {
+  __unenv__ = true;
+  static supportedEntryTypes = [];
+  _callback = null;
+  constructor(callback) {
+    this._callback = callback;
+  }
+  takeRecords() {
+    return [];
+  }
+  disconnect() {
+    throw /* @__PURE__ */ createNotImplementedError$4("PerformanceObserver.disconnect");
+  }
+  observe(options) {
+    throw /* @__PURE__ */ createNotImplementedError$4("PerformanceObserver.observe");
+  }
+  bind(fn) {
+    return fn;
+  }
+  runInAsyncScope(fn, thisArg, ...args) {
+    return fn.call(thisArg, ...args);
+  }
+  asyncId() {
+    return 0;
+  }
+  triggerAsyncId() {
+    return 0;
+  }
+  emitDestroy() {
+    return this;
+  }
+}
+const performance$4 = globalThis.performance && "addEventListener" in globalThis.performance ? globalThis.performance : new Performance();
+if (!("__unenv__" in performance$4)) {
+  const proto = Performance.prototype;
+  for (const key of Object.getOwnPropertyNames(proto)) {
+    if (key !== "constructor" && !(key in performance$4)) {
+      const desc = Object.getOwnPropertyDescriptor(proto, key);
+      if (desc) {
+        Object.defineProperty(performance$4, key, desc);
+      }
+    }
+  }
+}
+globalThis.performance = performance$4;
+globalThis.Performance = Performance;
+globalThis.PerformanceEntry = PerformanceEntry;
+globalThis.PerformanceMark = PerformanceMark;
+globalThis.PerformanceMeasure = PerformanceMeasure;
+globalThis.PerformanceObserver = PerformanceObserver;
+globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList;
+globalThis.PerformanceResourceTiming = PerformanceResourceTiming;
+const hrtime$4 = /* @__PURE__ */ Object.assign(function hrtime3(startTime) {
+  const now = Date.now();
+  const seconds = Math.trunc(now / 1e3);
+  const nanos = now % 1e3 * 1e6;
+  if (startTime) {
+    let diffSeconds = seconds - startTime[0];
+    let diffNanos = nanos - startTime[0];
+    if (diffNanos < 0) {
+      diffSeconds = diffSeconds - 1;
+      diffNanos = 1e9 + diffNanos;
+    }
+    return [diffSeconds, diffNanos];
+  }
+  return [seconds, nanos];
+}, { bigint: function bigint2() {
+  return BigInt(Date.now() * 1e6);
+} });
+let ReadStream$2 = class ReadStream2 {
   fd;
   isRaw = false;
   isTTY = false;
@@ -28,7 +806,7 @@ let ReadStream$2 = class ReadStream {
     return this;
   }
 };
-let WriteStream$2 = class WriteStream {
+let WriteStream$2 = class WriteStream2 {
   fd;
   columns = 80;
   rows = 24;
@@ -85,7 +863,7 @@ function notImplemented$3(name) {
   return Object.assign(fn, { __unenv__: true });
 }
 const NODE_VERSION$3 = "22.14.0";
-let Process$2 = class Process extends EventEmitter {
+let Process$2 = class Process2 extends EventEmitter {
   env;
   hrtime;
   nextTick;
@@ -94,7 +872,7 @@ let Process$2 = class Process extends EventEmitter {
     this.env = impl.env;
     this.hrtime = impl.hrtime;
     this.nextTick = impl.nextTick;
-    for (const prop of [...Object.getOwnPropertyNames(Process.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
+    for (const prop of [...Object.getOwnPropertyNames(Process2.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
       const value = this[prop];
       if (typeof value === "function") {
         this[prop] = value.bind(this);
@@ -383,7 +1161,7 @@ const {
   getMaxListeners: getMaxListeners$3,
   getuid: getuid$3,
   hasUncaughtExceptionCaptureCallback: hasUncaughtExceptionCaptureCallback$3,
-  hrtime: hrtime2,
+  hrtime: hrtime22,
   initgroups: initgroups$3,
   kill: kill$3,
   listenerCount: listenerCount$3,
@@ -465,7 +1243,7 @@ const _process$3 = {
   getBuiltinModule: getBuiltinModule$3,
   getActiveResourcesInfo: getActiveResourcesInfo$3,
   getMaxListeners: getMaxListeners$3,
-  hrtime: hrtime2,
+  hrtime: hrtime22,
   kill: kill$3,
   listeners: listeners$3,
   listenerCount: listenerCount$3,
@@ -567,7 +1345,7 @@ const nodeTiming$3 = {
     return this;
   }
 };
-let PerformanceEntry$2 = class PerformanceEntry {
+let PerformanceEntry$2 = class PerformanceEntry2 {
   __unenv__ = true;
   detail;
   entryType = "event";
@@ -591,7 +1369,7 @@ let PerformanceEntry$2 = class PerformanceEntry {
     };
   }
 };
-const PerformanceMark$2 = class PerformanceMark extends PerformanceEntry$2 {
+const PerformanceMark$2 = class PerformanceMark3 extends PerformanceEntry$2 {
   entryType = "mark";
   constructor() {
     super(...arguments);
@@ -600,10 +1378,10 @@ const PerformanceMark$2 = class PerformanceMark extends PerformanceEntry$2 {
     return 0;
   }
 };
-let PerformanceMeasure$2 = class PerformanceMeasure extends PerformanceEntry$2 {
+let PerformanceMeasure$2 = class PerformanceMeasure2 extends PerformanceEntry$2 {
   entryType = "measure";
 };
-let PerformanceResourceTiming$2 = class PerformanceResourceTiming extends PerformanceEntry$2 {
+let PerformanceResourceTiming$2 = class PerformanceResourceTiming2 extends PerformanceEntry$2 {
   entryType = "resource";
   serverTiming = [];
   connectEnd = 0;
@@ -627,7 +1405,7 @@ let PerformanceResourceTiming$2 = class PerformanceResourceTiming extends Perfor
   workerStart = 0;
   responseStatus = 0;
 };
-let PerformanceObserverEntryList$2 = class PerformanceObserverEntryList {
+let PerformanceObserverEntryList$2 = class PerformanceObserverEntryList2 {
   __unenv__ = true;
   getEntries() {
     return [];
@@ -639,7 +1417,7 @@ let PerformanceObserverEntryList$2 = class PerformanceObserverEntryList {
     return [];
   }
 };
-let Performance$2 = class Performance {
+let Performance$2 = class Performance2 {
   __unenv__ = true;
   timeOrigin = _timeOrigin$3;
   eventCounts = /* @__PURE__ */ new Map();
@@ -725,7 +1503,7 @@ let Performance$2 = class Performance {
     return this;
   }
 };
-let PerformanceObserver$2 = class PerformanceObserver {
+let PerformanceObserver$2 = class PerformanceObserver2 {
   __unenv__ = true;
   static supportedEntryTypes = [];
   _callback = null;
@@ -777,7 +1555,7 @@ globalThis.PerformanceMeasure = PerformanceMeasure$2;
 globalThis.PerformanceObserver = PerformanceObserver$2;
 globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList$2;
 globalThis.PerformanceResourceTiming = PerformanceResourceTiming$2;
-const hrtime$3 = /* @__PURE__ */ Object.assign(function hrtime3(startTime) {
+const hrtime$3 = /* @__PURE__ */ Object.assign(function hrtime32(startTime) {
   const now = Date.now();
   const seconds = Math.trunc(now / 1e3);
   const nanos = now % 1e3 * 1e6;
@@ -791,10 +1569,10 @@ const hrtime$3 = /* @__PURE__ */ Object.assign(function hrtime3(startTime) {
     return [diffSeconds, diffNanos];
   }
   return [seconds, nanos];
-}, { bigint: function bigint2() {
+}, { bigint: function bigint22() {
   return BigInt(Date.now() * 1e6);
 } });
-class ReadStream2 {
+class ReadStream22 {
   fd;
   isRaw = false;
   isTTY = false;
@@ -806,7 +1584,7 @@ class ReadStream2 {
     return this;
   }
 }
-class WriteStream2 {
+class WriteStream22 {
   fd;
   columns = 80;
   rows = 24;
@@ -863,7 +1641,7 @@ function notImplemented$2(name) {
   return Object.assign(fn, { __unenv__: true });
 }
 const NODE_VERSION$2 = "22.14.0";
-class Process2 extends EventEmitter {
+class Process22 extends EventEmitter {
   env;
   hrtime;
   nextTick;
@@ -872,7 +1650,7 @@ class Process2 extends EventEmitter {
     this.env = impl.env;
     this.hrtime = impl.hrtime;
     this.nextTick = impl.nextTick;
-    for (const prop of [...Object.getOwnPropertyNames(Process2.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
+    for (const prop of [...Object.getOwnPropertyNames(Process22.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
       const value = this[prop];
       if (typeof value === "function") {
         this[prop] = value.bind(this);
@@ -894,13 +1672,13 @@ class Process2 extends EventEmitter {
   #stdout;
   #stderr;
   get stdin() {
-    return this.#stdin ??= new ReadStream2(0);
+    return this.#stdin ??= new ReadStream22(0);
   }
   get stdout() {
-    return this.#stdout ??= new WriteStream2(1);
+    return this.#stdout ??= new WriteStream22(1);
   }
   get stderr() {
-    return this.#stderr ??= new WriteStream2(2);
+    return this.#stderr ??= new WriteStream22(2);
   }
   // --- cwd ---
   #cwd = "/";
@@ -1096,7 +1874,7 @@ class Process2 extends EventEmitter {
 const globalProcess$2 = globalThis["process"];
 const getBuiltinModule$2 = globalProcess$2.getBuiltinModule;
 const workerdProcess$2 = getBuiltinModule$2("node:process");
-const unenvProcess$2 = new Process2({
+const unenvProcess$2 = new Process22({
   env: globalProcess$2.env,
   hrtime: hrtime$3,
   // `nextTick` is available from workerd process v1
@@ -1161,7 +1939,7 @@ const {
   getMaxListeners: getMaxListeners$2,
   getuid: getuid$2,
   hasUncaughtExceptionCaptureCallback: hasUncaughtExceptionCaptureCallback$2,
-  hrtime: hrtime22,
+  hrtime: hrtime222,
   initgroups: initgroups$2,
   kill: kill$2,
   listenerCount: listenerCount$2,
@@ -1243,7 +2021,7 @@ const _process$2 = {
   getBuiltinModule: getBuiltinModule$2,
   getActiveResourcesInfo: getActiveResourcesInfo$2,
   getMaxListeners: getMaxListeners$2,
-  hrtime: hrtime22,
+  hrtime: hrtime222,
   kill: kill$2,
   listeners: listeners$2,
   listenerCount: listenerCount$2,
@@ -1345,7 +2123,7 @@ const nodeTiming$2 = {
     return this;
   }
 };
-class PerformanceEntry2 {
+class PerformanceEntry22 {
   __unenv__ = true;
   detail;
   entryType = "event";
@@ -1369,7 +2147,7 @@ class PerformanceEntry2 {
     };
   }
 }
-const PerformanceMark2 = class PerformanceMark22 extends PerformanceEntry2 {
+const PerformanceMark22 = class PerformanceMark222 extends PerformanceEntry22 {
   entryType = "mark";
   constructor() {
     super(...arguments);
@@ -1378,10 +2156,10 @@ const PerformanceMark2 = class PerformanceMark22 extends PerformanceEntry2 {
     return 0;
   }
 };
-class PerformanceMeasure2 extends PerformanceEntry2 {
+class PerformanceMeasure22 extends PerformanceEntry22 {
   entryType = "measure";
 }
-class PerformanceResourceTiming2 extends PerformanceEntry2 {
+class PerformanceResourceTiming22 extends PerformanceEntry22 {
   entryType = "resource";
   serverTiming = [];
   connectEnd = 0;
@@ -1405,7 +2183,7 @@ class PerformanceResourceTiming2 extends PerformanceEntry2 {
   workerStart = 0;
   responseStatus = 0;
 }
-class PerformanceObserverEntryList2 {
+class PerformanceObserverEntryList22 {
   __unenv__ = true;
   getEntries() {
     return [];
@@ -1417,7 +2195,7 @@ class PerformanceObserverEntryList2 {
     return [];
   }
 }
-class Performance2 {
+class Performance22 {
   __unenv__ = true;
   timeOrigin = _timeOrigin$2;
   eventCounts = /* @__PURE__ */ new Map();
@@ -1435,7 +2213,7 @@ class Performance2 {
     return {};
   }
   markResourceTiming() {
-    return new PerformanceResourceTiming2("");
+    return new PerformanceResourceTiming22("");
   }
   onresourcetimingbufferfull = null;
   now() {
@@ -1463,7 +2241,7 @@ class Performance2 {
     return this._entries.filter((e) => e.entryType === type);
   }
   mark(name, options) {
-    const entry = new PerformanceMark2(name, options);
+    const entry = new PerformanceMark22(name, options);
     this._entries.push(entry);
     return entry;
   }
@@ -1477,7 +2255,7 @@ class Performance2 {
       start = Number.parseFloat(startOrMeasureOptions?.start) || this.now();
       end = Number.parseFloat(startOrMeasureOptions?.end) || this.now();
     }
-    const entry = new PerformanceMeasure2(measureName, {
+    const entry = new PerformanceMeasure22(measureName, {
       startTime: start,
       detail: {
         start,
@@ -1503,7 +2281,7 @@ class Performance2 {
     return this;
   }
 }
-class PerformanceObserver2 {
+class PerformanceObserver22 {
   __unenv__ = true;
   static supportedEntryTypes = [];
   _callback = null;
@@ -1535,9 +2313,9 @@ class PerformanceObserver2 {
     return this;
   }
 }
-const performance$2 = globalThis.performance && "addEventListener" in globalThis.performance ? globalThis.performance : new Performance2();
+const performance$2 = globalThis.performance && "addEventListener" in globalThis.performance ? globalThis.performance : new Performance22();
 if (!("__unenv__" in performance$2)) {
-  const proto = Performance2.prototype;
+  const proto = Performance22.prototype;
   for (const key of Object.getOwnPropertyNames(proto)) {
     if (key !== "constructor" && !(key in performance$2)) {
       const desc = Object.getOwnPropertyDescriptor(proto, key);
@@ -1548,14 +2326,14 @@ if (!("__unenv__" in performance$2)) {
   }
 }
 globalThis.performance = performance$2;
-globalThis.Performance = Performance2;
-globalThis.PerformanceEntry = PerformanceEntry2;
-globalThis.PerformanceMark = PerformanceMark2;
-globalThis.PerformanceMeasure = PerformanceMeasure2;
-globalThis.PerformanceObserver = PerformanceObserver2;
-globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList2;
-globalThis.PerformanceResourceTiming = PerformanceResourceTiming2;
-const hrtime$2 = /* @__PURE__ */ Object.assign(function hrtime32(startTime) {
+globalThis.Performance = Performance22;
+globalThis.PerformanceEntry = PerformanceEntry22;
+globalThis.PerformanceMark = PerformanceMark22;
+globalThis.PerformanceMeasure = PerformanceMeasure22;
+globalThis.PerformanceObserver = PerformanceObserver22;
+globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList22;
+globalThis.PerformanceResourceTiming = PerformanceResourceTiming22;
+const hrtime$2 = /* @__PURE__ */ Object.assign(function hrtime322(startTime) {
   const now = Date.now();
   const seconds = Math.trunc(now / 1e3);
   const nanos = now % 1e3 * 1e6;
@@ -1569,10 +2347,10 @@ const hrtime$2 = /* @__PURE__ */ Object.assign(function hrtime32(startTime) {
     return [diffSeconds, diffNanos];
   }
   return [seconds, nanos];
-}, { bigint: function bigint22() {
+}, { bigint: function bigint222() {
   return BigInt(Date.now() * 1e6);
 } });
-let ReadStream$1 = class ReadStream22 {
+let ReadStream$1 = class ReadStream222 {
   fd;
   isRaw = false;
   isTTY = false;
@@ -1584,7 +2362,7 @@ let ReadStream$1 = class ReadStream22 {
     return this;
   }
 };
-let WriteStream$1 = class WriteStream22 {
+let WriteStream$1 = class WriteStream222 {
   fd;
   columns = 80;
   rows = 24;
@@ -1641,7 +2419,7 @@ function notImplemented$1(name) {
   return Object.assign(fn, { __unenv__: true });
 }
 const NODE_VERSION$1 = "22.14.0";
-let Process$1 = class Process22 extends EventEmitter {
+let Process$1 = class Process222 extends EventEmitter {
   env;
   hrtime;
   nextTick;
@@ -1650,7 +2428,7 @@ let Process$1 = class Process22 extends EventEmitter {
     this.env = impl.env;
     this.hrtime = impl.hrtime;
     this.nextTick = impl.nextTick;
-    for (const prop of [...Object.getOwnPropertyNames(Process22.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
+    for (const prop of [...Object.getOwnPropertyNames(Process222.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
       const value = this[prop];
       if (typeof value === "function") {
         this[prop] = value.bind(this);
@@ -1939,7 +2717,7 @@ const {
   getMaxListeners: getMaxListeners$1,
   getuid: getuid$1,
   hasUncaughtExceptionCaptureCallback: hasUncaughtExceptionCaptureCallback$1,
-  hrtime: hrtime222,
+  hrtime: hrtime2222,
   initgroups: initgroups$1,
   kill: kill$1,
   listenerCount: listenerCount$1,
@@ -2021,7 +2799,7 @@ const _process$1 = {
   getBuiltinModule: getBuiltinModule$1,
   getActiveResourcesInfo: getActiveResourcesInfo$1,
   getMaxListeners: getMaxListeners$1,
-  hrtime: hrtime222,
+  hrtime: hrtime2222,
   kill: kill$1,
   listeners: listeners$1,
   listenerCount: listenerCount$1,
@@ -2123,7 +2901,7 @@ const nodeTiming$1 = {
     return this;
   }
 };
-let PerformanceEntry$1 = class PerformanceEntry22 {
+let PerformanceEntry$1 = class PerformanceEntry222 {
   __unenv__ = true;
   detail;
   entryType = "event";
@@ -2147,7 +2925,7 @@ let PerformanceEntry$1 = class PerformanceEntry22 {
     };
   }
 };
-const PerformanceMark$1 = class PerformanceMark3 extends PerformanceEntry$1 {
+const PerformanceMark$1 = class PerformanceMark32 extends PerformanceEntry$1 {
   entryType = "mark";
   constructor() {
     super(...arguments);
@@ -2156,10 +2934,10 @@ const PerformanceMark$1 = class PerformanceMark3 extends PerformanceEntry$1 {
     return 0;
   }
 };
-let PerformanceMeasure$1 = class PerformanceMeasure22 extends PerformanceEntry$1 {
+let PerformanceMeasure$1 = class PerformanceMeasure222 extends PerformanceEntry$1 {
   entryType = "measure";
 };
-let PerformanceResourceTiming$1 = class PerformanceResourceTiming22 extends PerformanceEntry$1 {
+let PerformanceResourceTiming$1 = class PerformanceResourceTiming222 extends PerformanceEntry$1 {
   entryType = "resource";
   serverTiming = [];
   connectEnd = 0;
@@ -2183,7 +2961,7 @@ let PerformanceResourceTiming$1 = class PerformanceResourceTiming22 extends Perf
   workerStart = 0;
   responseStatus = 0;
 };
-let PerformanceObserverEntryList$1 = class PerformanceObserverEntryList22 {
+let PerformanceObserverEntryList$1 = class PerformanceObserverEntryList222 {
   __unenv__ = true;
   getEntries() {
     return [];
@@ -2195,7 +2973,7 @@ let PerformanceObserverEntryList$1 = class PerformanceObserverEntryList22 {
     return [];
   }
 };
-let Performance$1 = class Performance22 {
+let Performance$1 = class Performance222 {
   __unenv__ = true;
   timeOrigin = _timeOrigin$1;
   eventCounts = /* @__PURE__ */ new Map();
@@ -2281,7 +3059,7 @@ let Performance$1 = class Performance22 {
     return this;
   }
 };
-let PerformanceObserver$1 = class PerformanceObserver22 {
+let PerformanceObserver$1 = class PerformanceObserver222 {
   __unenv__ = true;
   static supportedEntryTypes = [];
   _callback = null;
@@ -2333,7 +3111,7 @@ globalThis.PerformanceMeasure = PerformanceMeasure$1;
 globalThis.PerformanceObserver = PerformanceObserver$1;
 globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList$1;
 globalThis.PerformanceResourceTiming = PerformanceResourceTiming$1;
-const hrtime$1 = /* @__PURE__ */ Object.assign(function hrtime322(startTime) {
+const hrtime$1 = /* @__PURE__ */ Object.assign(function hrtime3222(startTime) {
   const now = Date.now();
   const seconds = Math.trunc(now / 1e3);
   const nanos = now % 1e3 * 1e6;
@@ -2347,10 +3125,10 @@ const hrtime$1 = /* @__PURE__ */ Object.assign(function hrtime322(startTime) {
     return [diffSeconds, diffNanos];
   }
   return [seconds, nanos];
-}, { bigint: function bigint222() {
+}, { bigint: function bigint2222() {
   return BigInt(Date.now() * 1e6);
 } });
-class ReadStream222 {
+class ReadStream2222 {
   fd;
   isRaw = false;
   isTTY = false;
@@ -2362,7 +3140,7 @@ class ReadStream222 {
     return this;
   }
 }
-class WriteStream222 {
+class WriteStream2222 {
   fd;
   columns = 80;
   rows = 24;
@@ -2419,7 +3197,7 @@ function notImplemented(name) {
   return Object.assign(fn, { __unenv__: true });
 }
 const NODE_VERSION = "22.14.0";
-class Process222 extends EventEmitter {
+class Process2222 extends EventEmitter {
   env;
   hrtime;
   nextTick;
@@ -2428,7 +3206,7 @@ class Process222 extends EventEmitter {
     this.env = impl.env;
     this.hrtime = impl.hrtime;
     this.nextTick = impl.nextTick;
-    for (const prop of [...Object.getOwnPropertyNames(Process222.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
+    for (const prop of [...Object.getOwnPropertyNames(Process2222.prototype), ...Object.getOwnPropertyNames(EventEmitter.prototype)]) {
       const value = this[prop];
       if (typeof value === "function") {
         this[prop] = value.bind(this);
@@ -2450,13 +3228,13 @@ class Process222 extends EventEmitter {
   #stdout;
   #stderr;
   get stdin() {
-    return this.#stdin ??= new ReadStream222(0);
+    return this.#stdin ??= new ReadStream2222(0);
   }
   get stdout() {
-    return this.#stdout ??= new WriteStream222(1);
+    return this.#stdout ??= new WriteStream2222(1);
   }
   get stderr() {
-    return this.#stderr ??= new WriteStream222(2);
+    return this.#stderr ??= new WriteStream2222(2);
   }
   // --- cwd ---
   #cwd = "/";
@@ -2652,7 +3430,7 @@ class Process222 extends EventEmitter {
 const globalProcess = globalThis["process"];
 const getBuiltinModule = globalProcess.getBuiltinModule;
 const workerdProcess = getBuiltinModule("node:process");
-const unenvProcess = new Process222({
+const unenvProcess = new Process2222({
   env: globalProcess.env,
   hrtime: hrtime$1,
   // `nextTick` is available from workerd process v1
@@ -2717,7 +3495,7 @@ const {
   getMaxListeners,
   getuid,
   hasUncaughtExceptionCaptureCallback,
-  hrtime: hrtime2222,
+  hrtime: hrtime22222,
   initgroups,
   kill,
   listenerCount,
@@ -2799,7 +3577,7 @@ const _process = {
   getBuiltinModule,
   getActiveResourcesInfo,
   getMaxListeners,
-  hrtime: hrtime2222,
+  hrtime: hrtime22222,
   kill,
   listeners,
   listenerCount,
@@ -2901,7 +3679,7 @@ const nodeTiming = {
     return this;
   }
 };
-class PerformanceEntry222 {
+class PerformanceEntry2222 {
   __unenv__ = true;
   detail;
   entryType = "event";
@@ -2925,7 +3703,7 @@ class PerformanceEntry222 {
     };
   }
 }
-const PerformanceMark222 = class PerformanceMark2222 extends PerformanceEntry222 {
+const PerformanceMark2222 = class PerformanceMark22222 extends PerformanceEntry2222 {
   entryType = "mark";
   constructor() {
     super(...arguments);
@@ -2934,10 +3712,10 @@ const PerformanceMark222 = class PerformanceMark2222 extends PerformanceEntry222
     return 0;
   }
 };
-class PerformanceMeasure222 extends PerformanceEntry222 {
+class PerformanceMeasure2222 extends PerformanceEntry2222 {
   entryType = "measure";
 }
-class PerformanceResourceTiming222 extends PerformanceEntry222 {
+class PerformanceResourceTiming2222 extends PerformanceEntry2222 {
   entryType = "resource";
   serverTiming = [];
   connectEnd = 0;
@@ -2961,7 +3739,7 @@ class PerformanceResourceTiming222 extends PerformanceEntry222 {
   workerStart = 0;
   responseStatus = 0;
 }
-class PerformanceObserverEntryList222 {
+class PerformanceObserverEntryList2222 {
   __unenv__ = true;
   getEntries() {
     return [];
@@ -2973,7 +3751,7 @@ class PerformanceObserverEntryList222 {
     return [];
   }
 }
-class Performance222 {
+class Performance2222 {
   __unenv__ = true;
   timeOrigin = _timeOrigin;
   eventCounts = /* @__PURE__ */ new Map();
@@ -2991,7 +3769,7 @@ class Performance222 {
     return {};
   }
   markResourceTiming() {
-    return new PerformanceResourceTiming222("");
+    return new PerformanceResourceTiming2222("");
   }
   onresourcetimingbufferfull = null;
   now() {
@@ -3019,7 +3797,7 @@ class Performance222 {
     return this._entries.filter((e) => e.entryType === type);
   }
   mark(name, options) {
-    const entry = new PerformanceMark222(name, options);
+    const entry = new PerformanceMark2222(name, options);
     this._entries.push(entry);
     return entry;
   }
@@ -3033,7 +3811,7 @@ class Performance222 {
       start = Number.parseFloat(startOrMeasureOptions?.start) || this.now();
       end = Number.parseFloat(startOrMeasureOptions?.end) || this.now();
     }
-    const entry = new PerformanceMeasure222(measureName, {
+    const entry = new PerformanceMeasure2222(measureName, {
       startTime: start,
       detail: {
         start,
@@ -3059,7 +3837,7 @@ class Performance222 {
     return this;
   }
 }
-class PerformanceObserver222 {
+class PerformanceObserver2222 {
   __unenv__ = true;
   static supportedEntryTypes = [];
   _callback = null;
@@ -3091,9 +3869,9 @@ class PerformanceObserver222 {
     return this;
   }
 }
-const performance = globalThis.performance && "addEventListener" in globalThis.performance ? globalThis.performance : new Performance222();
+const performance = globalThis.performance && "addEventListener" in globalThis.performance ? globalThis.performance : new Performance2222();
 if (!("__unenv__" in performance)) {
-  const proto = Performance222.prototype;
+  const proto = Performance2222.prototype;
   for (const key of Object.getOwnPropertyNames(proto)) {
     if (key !== "constructor" && !(key in performance)) {
       const desc = Object.getOwnPropertyDescriptor(proto, key);
@@ -3104,13 +3882,13 @@ if (!("__unenv__" in performance)) {
   }
 }
 globalThis.performance = performance;
-globalThis.Performance = Performance222;
-globalThis.PerformanceEntry = PerformanceEntry222;
-globalThis.PerformanceMark = PerformanceMark222;
-globalThis.PerformanceMeasure = PerformanceMeasure222;
-globalThis.PerformanceObserver = PerformanceObserver222;
-globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList222;
-globalThis.PerformanceResourceTiming = PerformanceResourceTiming222;
+globalThis.Performance = Performance2222;
+globalThis.PerformanceEntry = PerformanceEntry2222;
+globalThis.PerformanceMark = PerformanceMark2222;
+globalThis.PerformanceMeasure = PerformanceMeasure2222;
+globalThis.PerformanceObserver = PerformanceObserver2222;
+globalThis.PerformanceObserverEntryList = PerformanceObserverEntryList2222;
+globalThis.PerformanceResourceTiming = PerformanceResourceTiming2222;
 let lastCapturedError;
 const TTL_MS = 5e3;
 function record(error) {
@@ -3166,7 +3944,7 @@ function renderErrorPage() {
 let serverEntryPromise;
 async function getServerEntry() {
   if (!serverEntryPromise) {
-    serverEntryPromise = import("./assets/server-AHFj_Bgy-gsoihpy4-CbyuSDu4-Ble6ghI2-BbTWyedm.js").then((n) => n.a6).then((n) => n.s).then(
+    serverEntryPromise = import("./assets/server-AHFj_Bgy-gsoihpy4-CbyuSDu4-Ble6ghI2-BbTWyedm-DMY4rmEE.js").then((n) => n.a6).then((n) => n.s).then(
       (m) => m.default ?? m
     );
   }
@@ -3221,7 +3999,8 @@ const server = {
 const workerEntry$1 = server ?? {};
 const workerEntry$2 = workerEntry$1 ?? {};
 const workerEntry$3 = workerEntry$2 ?? {};
-const workerEntry = workerEntry$3 ?? {};
+const workerEntry$4 = workerEntry$3 ?? {};
+const workerEntry = workerEntry$4 ?? {};
 export {
   workerEntry as default,
   renderErrorPage as r
