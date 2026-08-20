@@ -20,7 +20,7 @@ export const excluirOrganizacao = createServerFn({ method: "POST" })
       "folgas",
       "notas",
       "turnos",
-      "membros",
+      "membros_equipe",
       "cargos",
       "profiles",
     ] as const;

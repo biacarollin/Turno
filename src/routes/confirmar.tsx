@@ -43,7 +43,7 @@ function Confirmar() {
         } else {
           setEquipeId(data.id);
           setEquipeNome(data.nome);
-          setFilialNome((data.filiais as any)?.nome ?? null);
+          setFilialNome((data.filiais as { nome: string } | null)?.nome ?? null);
         }
         setLoading(false);
       });

@@ -16,6 +16,7 @@ import { jsPDF } from "jspdf";
 import { useCargos, useMembros } from "@/stores/equipe";
 import { excluirOrganizacao } from "@/lib/organizacao.functions";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { useSession, useMinhasEquipes } from "@/hooks/use-session";
 import { getSegmentoLabel } from "@/lib/segmentos";
 
@@ -115,11 +116,11 @@ function Configuracoes() {
       });
   }, [filial_id]);
 
-  const salvar = async (patch: Partial<Record<string, unknown>>) => {
+  const salvar = async (patch: Partial<Database["public"]["Tables"]["configuracoes_filial"]["Update"]>) => {
     if (!filial_id) return;
     const { error } = await supabase
       .from("configuracoes_filial")
-      .update(patch as any)
+      .update(patch)
       .eq("filial_id", filial_id);
     if (error) toast.error("Erro ao salvar");
     else toast.success("Salvo", { duration: 1200 });
@@ -146,9 +147,9 @@ function Configuracoes() {
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password: senha });
       if (signInErr) throw new Error("Senha incorreta");
       await excluirOrgFn();
-      try { await supabase.auth.signOut({ scope: "global" }); } catch { }
-      try { window.localStorage.clear(); } catch { }
-      try { window.sessionStorage.clear(); } catch { }
+      try { await supabase.auth.signOut({ scope: "global" }); } catch { /* melhor esforço, conta já foi excluída */ }
+      try { window.localStorage.clear(); } catch { /* melhor esforço */ }
+      try { window.sessionStorage.clear(); } catch { /* melhor esforço */ }
       toast.success("Organização excluída");
       setExcluirOpen(false);
       window.location.replace("/login?excluida=1");

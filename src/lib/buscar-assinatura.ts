@@ -15,6 +15,9 @@ export const buscarAssinatura = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<AssinaturaAtiva | null> => {
     const { supabase } = context;
 
+    // A tabela "assinaturas" é gerenciada pelo webhook do Stripe e ainda não
+    // está no arquivo de tipos gerado (types.ts) — cast necessário até regenerar.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase as any)
       .from("assinaturas")
       .select("plano, periodo, status, trial_end, current_period_end, stripe_customer_id")
