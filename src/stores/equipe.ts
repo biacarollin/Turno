@@ -120,7 +120,7 @@ export function useMembros(equipe_id?: string) {
         .eq("equipe_id", equipe_id!)
         .order("created_at", { ascending: true });
       if (error) throw error;
-      return (data ?? []).map((r: any) => mapMembro(r));
+      return (data ?? []).map((r) => mapMembro(r as unknown as MembroRow));
     },
   });
 }

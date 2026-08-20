@@ -27,20 +27,20 @@ export function useConfigurarSegmento() {
       if (!sub) throw new Error("Subcategoria inválida");
 
       // Cria organização + filial + vincula como admin
-      const { data: resultado, error: orgErr } = await (supabase as any).rpc(
-  "criar_organizacao_filial",
-  {
-    p_empresa_nome: input.empresaNome.trim(),
-    p_segmento: input.subId,
-    p_segmento_topo: input.topoId,
-    p_segmento_custom:
-      input.subId === "outras" && input.subNomeCustom?.trim()
-        ? input.subNomeCustom.trim()
-        : null,
-  }
-);
-if (orgErr) throw orgErr;
-const filial_id = (resultado as { filial_id: string }).filial_id;
+      const { data: resultado, error: orgErr } = await supabase.rpc(
+        "criar_organizacao_filial",
+        {
+          p_empresa_nome: input.empresaNome.trim(),
+          p_segmento: input.subId,
+          p_segmento_topo: input.topoId,
+          p_segmento_custom:
+            input.subId === "outras" && input.subNomeCustom?.trim()
+              ? input.subNomeCustom.trim()
+              : undefined,
+        }
+      );
+      if (orgErr) throw orgErr;
+      const filial_id = (resultado as { filial_id: string }).filial_id;
 
       // Cria equipe padrão dentro da filial
       const { data: equipe, error: eqErr } = await supabase

@@ -78,9 +78,9 @@ export function useMinhasEquipes() {
 
       if (error) throw error;
 
-      return (data ?? []).map((item: any) => ({
+      return (data ?? []).map((item) => ({
         equipe_id: item.equipe_id,
-        equipe_nome: item.equipes?.nome ?? "Equipe",
+        equipe_nome: (item.equipes as { nome: string } | null)?.nome ?? "Equipe",
       }));
     },
   });

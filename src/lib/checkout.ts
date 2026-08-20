@@ -1,11 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async (ctx: any) => {
-    const priceKey = ctx?.data?.priceKey as string | undefined;
+  .handler(async (ctx: { data?: { priceKey?: string }; context: { userId: string } }) => {
+    const priceKey = ctx?.data?.priceKey;
     const { userId } = ctx.context;
 
     if (!priceKey || typeof priceKey !== "string") {
