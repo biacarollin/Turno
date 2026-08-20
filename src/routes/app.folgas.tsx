@@ -59,7 +59,7 @@ function Folgas() {
         title="Folgas"
         subtitle="Registre e acompanhe folgas da equipe."
         actions={
-          <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => setOpen(true)}>
+          <Button className="bg-app-900 hover:bg-app-800" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" /> Nova folga
           </Button>
         }
@@ -81,7 +81,7 @@ function Folgas() {
                 <div className="flex items-center gap-2">
                   <Badge
                     variant={f.status === "aprovada" ? "default" : f.status === "recusada" ? "outline" : "secondary"}
-                    className={f.status === "aprovada" ? "bg-turno-500" : f.status === "recusada" ? "border-destructive text-destructive" : ""}
+                    className={f.status === "aprovada" ? "bg-app-500" : f.status === "recusada" ? "border-destructive text-destructive" : ""}
                   >
                     {f.status}
                   </Badge>
@@ -96,7 +96,7 @@ function Folgas() {
                 {f.status !== "aprovada" && (
                   <Button variant="ghost" size="icon"
                     onClick={() => atualizarStatus.mutate({ id: f.id, status: "aprovada", filial_id: f.filial_id })}>
-                    <Check className="h-4 w-4 text-turno-600" />
+                    <Check className="h-4 w-4 text-app-600" />
                   </Button>
                 )}
                 {f.status !== "recusada" && (
@@ -148,7 +148,7 @@ function Folgas() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-              <Button type="submit" className="bg-turno-600 hover:bg-turno-700" disabled={criar.isPending}>Registrar</Button>
+              <Button type="submit" className="bg-app-900 hover:bg-app-800" disabled={criar.isPending}>Registrar</Button>
             </DialogFooter>
           </form>
         </DialogContent>

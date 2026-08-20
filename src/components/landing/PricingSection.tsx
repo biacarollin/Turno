@@ -5,7 +5,7 @@ import { createCheckoutSession } from "@/lib/checkout";
 
 type Plan = {
   name: string;
-  badge?: string;
+  tagline: string;
   priceMonthly: string;
   priceAnnual: string;
   priceAnnualFull: string;
@@ -14,7 +14,6 @@ type Plan = {
   features: string[];
   cta: string;
   popular?: boolean;
-  enterprise?: boolean;
   priceKeyMonthly?: string;
   priceKeyAnnual?: string;
 };
@@ -22,89 +21,62 @@ type Plan = {
 const plans: Plan[] = [
   {
     name: "Grátis",
+    tagline: "Para conhecer o produto",
     priceMonthly: "0",
     priceAnnual: "0",
     priceAnnualFull: "0",
     annualEquivalent: "0",
     seats: "Até 3 membros",
-    features: [
-      "Passagens de turno",
-      "Histórico 7 dias",
-      "App mobile + painel web",
-    ],
+    features: ["1 equipe", "Até 5 membros", "Log de ocorrências", "Chat com IA"],
     cta: "Começar grátis",
   },
   {
     name: "Básico",
+    tagline: "Para equipes pequenas",
     priceMonthly: "69",
     priceAnnual: "684",
     priceAnnualFull: "828",
     annualEquivalent: "57",
     seats: "Até 8 membros",
-    features: [
-      "Tudo do Grátis +",
-      "Resumo IA ao encerrar turno",
-      "Assinatura digital",
-      "Histórico 90 dias",
-    ],
-    cta: "Testar 7 dias grátis",
+    features: ["3 equipes", "Até 20 membros", "Assinatura digital", "Histórico completo", "Chat com IA"],
+    cta: "Começar trial",
     priceKeyMonthly: "basico_mensal",
     priceKeyAnnual: "basico_anual",
   },
   {
     name: "Equipe",
-    badge: "Mais popular",
+    tagline: "O mais escolhido",
     priceMonthly: "159",
     priceAnnual: "1.584",
     priceAnnualFull: "1.908",
     annualEquivalent: "132",
     seats: "Até 20 membros",
     features: [
-      "Tudo do Básico +",
-      "Análises por IA",
-      "Histórico 1 ano",
-      "Notas privadas do gestor",
+      "Equipes ilimitadas",
+      "Até 80 membros",
+      "Assinatura digital",
+      "Resumo por IA",
+      "Painel do gestor",
+      "Notas privadas",
+      "Chat com IA",
     ],
-    cta: "Testar 7 dias grátis",
+    cta: "Começar trial",
     popular: true,
     priceKeyMonthly: "equipe_mensal",
     priceKeyAnnual: "equipe_anual",
   },
   {
     name: "Profissional",
+    tagline: "Para operações complexas",
     priceMonthly: "289",
     priceAnnual: "2.880",
     priceAnnualFull: "3.468",
     annualEquivalent: "240",
     seats: "Até 50 membros",
-    features: [
-      "Tudo do Equipe +",
-      "Multi-unidade (até 5)",
-      "Exportação em PDF",
-      "Relatórios avançados",
-      "Histórico ilimitado",
-    ],
-    cta: "Testar 7 dias grátis",
+    features: ["Multi-filial", "Membros ilimitados", "Alertas de IA", "Exportação PDF", "Relatórios avançados", "Suporte prioritário"],
+    cta: "Começar trial",
     priceKeyMonthly: "profissional_mensal",
     priceKeyAnnual: "profissional_anual",
-  },
-  {
-    name: "Enterprise",
-    badge: "Enterprise",
-    priceMonthly: "Sob",
-    priceAnnual: "Sob",
-    priceAnnualFull: "0",
-    annualEquivalent: "0",
-    seats: "Acima de 50 membros",
-    features: [
-      "Tudo do Profissional +",
-      "Multi-unidade ilimitada",
-      "SSO corporativo",
-      "Onboarding dedicado",
-      "SLA contratual",
-    ],
-    cta: "Falar com a equipe",
-    enterprise: true,
   },
 ];
 
@@ -132,157 +104,126 @@ export function PricingSection() {
   }
 
   return (
-    <section id="precos" className="w-full bg-background py-20 md:py-28">
+    <section id="precos" className="w-full bg-gray-50 py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-[2.5rem]">
-            Preços simples, sem surpresa
+        <div className="mx-auto max-w-xl text-center">
+          <span className="text-[10px] font-semibold uppercase tracking-[2px] text-app-600">
+            Preços
+          </span>
+          <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+            Simples e transparente
           </h2>
-          <p className="mt-3 text-muted-foreground">
-            Para equipes de qualquer tamanho. Cancele quando quiser.
+          <p className="mt-3 text-gray-600">
+            Comece grátis. 7 dias de trial em todos os planos pagos.
           </p>
 
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-turno-200 bg-turno-50 px-4 py-2 text-sm text-turno-600">
-            <span className="h-2 w-2 rounded-full bg-turno-400" />
-            Chat IA incluído em todos os planos
-          </div>
-
-          <div className="mt-6 inline-flex items-center gap-3">
-            <span className={`text-sm ${!annual ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
-              Mensal
-            </span>
+          <div className="mt-8 inline-flex items-center gap-1 rounded-full bg-gray-200 p-1">
             <button
               type="button"
-              role="switch"
-              aria-checked={annual}
-              onClick={() => setAnnual((v) => !v)}
-              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
-                annual ? "bg-turno-500" : "bg-muted"
+              onClick={() => setAnnual(false)}
+              className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                !annual ? "bg-white text-gray-900 shadow-sm" : "text-gray-600"
               }`}
             >
-              <span
-                className={`inline-block h-6 w-6 transform rounded-full bg-white shadow transition-transform ${
-                  annual ? "translate-x-[1.375rem]" : "translate-x-0.5"
-                }`}
-              />
+              Mensal
             </button>
-            <span className={`text-sm ${annual ? "font-semibold text-foreground" : "text-muted-foreground"}`}>
-              Anual{" "}
-              <span className="ml-1 rounded-full bg-turno-100 px-2 py-0.5 text-xs text-turno-700">
-                17% OFF
-              </span>
-            </span>
+            <button
+              type="button"
+              onClick={() => setAnnual(true)}
+              className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
+                annual ? "bg-white text-gray-900 shadow-sm" : "text-gray-600"
+              }`}
+            >
+              Anual −17%
+            </button>
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative flex flex-col rounded-2xl border p-7 ${
-                plan.popular
-                  ? "border-2 border-primary bg-card shadow-lg"
-                  : plan.enterprise
-                  ? "border-turno-200 bg-turno-50"
-                  : "border-border bg-card"
-              }`}
-            >
-              {plan.badge && (
-                <span className="absolute -top-3 left-6 inline-flex items-center rounded-full bg-primary px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                  {plan.badge}
-                </span>
-              )}
+        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {plans.map((plan) => {
+            const gratis = plan.priceMonthly === "0";
+            return (
+              <div
+                key={plan.name}
+                className={`relative flex flex-col rounded-2xl p-6 ${
+                  plan.popular
+                    ? "border-2 border-app-500 bg-app-900"
+                    : "border border-gray-200 bg-white"
+                }`}
+              >
+                {plan.popular && (
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-app-500 px-3.5 py-1 text-[11px] font-semibold text-white">
+                    Mais escolhido
+                  </span>
+                )}
 
-              <h3 className="text-lg font-semibold text-foreground">{plan.name}</h3>
+                <h3 className={`text-[11px] font-semibold uppercase tracking-wide ${plan.popular ? "text-app-400" : "text-gray-500"}`}>
+                  {plan.name}
+                </h3>
 
-              {plan.enterprise ? (
-                <div className="mt-4">
-                  <span className="text-2xl font-semibold text-foreground">Sob consulta</span>
-                </div>
-              ) : plan.priceMonthly === "0" ? (
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-4xl font-semibold tracking-tight text-foreground">R$0</span>
-                  <span className="text-sm text-muted-foreground">/mês</span>
-                </div>
-              ) : annual ? (
-                <div className="mt-4">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-sm font-medium text-foreground">R$</span>
-                    <span className="text-4xl font-semibold tracking-tight text-foreground">
-                      {plan.priceAnnual}
-                    </span>
-                    <span className="text-sm text-muted-foreground">/ano</span>
-                  </div>
-                  <p className="mt-1 text-xs text-turno-600">
-                    <s className="text-muted-foreground opacity-60">R${plan.priceAnnualFull}</s>{" "}
-                    17% OFF
-                  </p>
-                  <span className="mt-1 inline-block rounded-md bg-turno-50 px-2 py-0.5 text-[11px] text-turno-700">
-                    R${plan.annualEquivalent}/mês equivalente
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className={`text-4xl font-extrabold tracking-tight ${plan.popular ? "text-white" : "text-gray-900"}`}>
+                    R${gratis ? "0" : annual ? plan.priceAnnual : plan.priceMonthly}
+                  </span>
+                  <span className={`text-sm ${plan.popular ? "text-app-400" : "text-gray-500"}`}>
+                    {gratis ? "/mês" : annual ? "/ano" : "/mês"}
                   </span>
                 </div>
-              ) : (
-                <div className="mt-4">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-sm font-medium text-foreground">R$</span>
-                    <span className="text-4xl font-semibold tracking-tight text-foreground">
-                      {plan.priceMonthly}
-                    </span>
-                    <span className="text-sm text-muted-foreground">/mês</span>
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">Cancele quando quiser</p>
-                </div>
-              )}
+                <p className={`mt-2 text-xs ${plan.popular ? "text-app-400" : "text-gray-500"}`}>{plan.tagline}</p>
 
-              <p className="mt-1 text-xs text-muted-foreground">{plan.seats}</p>
+                <div className={`my-5 h-px ${plan.popular ? "bg-app-700" : "bg-gray-200"}`} />
 
-              <ul className="mt-6 flex flex-col gap-3">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 text-sm text-foreground/80">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-turno-500" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
+                <ul className="flex flex-1 flex-col gap-2.5">
+                  {plan.features.map((f) => (
+                    <li
+                      key={f}
+                      className={`flex items-start gap-2 text-xs ${plan.popular ? "text-app-200" : "text-gray-700"}`}
+                    >
+                      <Check className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${plan.popular ? "text-app-400" : "text-app-600"}`} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
 
-              {plan.enterprise ? (
-                <Link
-                  to="/contato"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-                >
-                  {plan.cta}
-                </Link>
-              ) : plan.priceMonthly === "0" ? (
-                <Link
-                  to="/login"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-                >
-                  {plan.cta}
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => handleCheckout(plan)}
-                  disabled={loadingPlan === plan.name}
-                  className={`mt-8 inline-flex w-full items-center justify-center rounded-full px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
-                    plan.popular
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "border border-border bg-background text-foreground hover:bg-muted"
-                  }`}
-                >
-                  {loadingPlan === plan.name ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Aguarde...
-                    </>
-                  ) : (
-                    plan.cta
-                  )}
-                </button>
-              )}
-            </div>
-          ))}
+                {gratis ? (
+                  <Link
+                    to="/login"
+                    className="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-200"
+                  >
+                    {plan.cta}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleCheckout(plan)}
+                    disabled={loadingPlan === plan.name}
+                    className={`mt-6 inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+                      plan.popular
+                        ? "bg-app-500 text-white hover:bg-app-400"
+                        : "bg-gray-900 text-white hover:bg-gray-800"
+                    }`}
+                  >
+                    {loadingPlan === plan.name ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Aguarde...
+                      </>
+                    ) : (
+                      plan.cta
+                    )}
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
+
+        <p className="mt-10 text-center text-sm text-gray-600">
+          Enterprise com SLA e suporte dedicado.{" "}
+          <Link to="/contato" className="font-semibold text-app-600 hover:underline">
+            Fale com a gente
+          </Link>
+        </p>
       </div>
     </section>
   );

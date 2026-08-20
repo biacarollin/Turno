@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Trash2, CheckCircle2, RotateCcw, AlertCircle } from "lucide-react";
+import { Plus, Trash2, AlertCircle } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,22 +56,56 @@ function Ocorrencias() {
     }
   };
 
-  const gravBadge = (g: string) =>
-    g === "alta" ? "border-red-500 bg-red-50 text-red-700"
-    : g === "media" ? "border-amber-500 text-amber-700"
-    : "border-emerald-500 text-emerald-700";
+  const gravInfo: Record<string, { bar: string; badge: string; label: string }> = {
+    alta: { bar: "bg-amber-500", badge: "bg-amber-100 text-amber-700", label: "Alta" },
+    media: { bar: "bg-orange-500", badge: "bg-orange-50 text-orange-700", label: "Média" },
+    baixa: { bar: "bg-app-500", badge: "bg-app-100 text-app-700", label: "Baixa" },
+  };
+
+  const [filtroGrav, setFiltroGrav] = useState<"todas" | "alta" | "media" | "baixa" | "resolvidas">("todas");
+  const listaFiltrada = lista.filter((o) => {
+    if (filtroGrav === "todas") return true;
+    if (filtroGrav === "resolvidas") return o.status === "concluida";
+    return o.gravidade === filtroGrav && o.status === "aberta";
+  });
+
+  const filtros: { id: typeof filtroGrav; label: string }[] = [
+    { id: "todas", label: "Todas" },
+    { id: "alta", label: "Alta" },
+    { id: "media", label: "Média" },
+    { id: "baixa", label: "Baixa" },
+    { id: "resolvidas", label: "Resolvidas" },
+  ];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
       <PageHeader
         title="Ocorrências"
         subtitle="Registre tudo o que acontece nos turnos."
         actions={
-          <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => setOpen(true)}>
+          <Button className="bg-app-900 hover:bg-app-800" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" /> Nova ocorrência
           </Button>
         }
       />
+
+      {lista.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {filtros.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFiltroGrav(f.id)}
+              className={`rounded-[7px] px-3.5 py-1.5 text-xs font-semibold transition ${
+                filtroGrav === f.id
+                  ? "bg-app-900 text-white"
+                  : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {isLoading ? (
         <Card className="p-8 text-center text-sm text-muted-foreground">Carregando...</Card>
@@ -80,55 +114,64 @@ function Ocorrencias() {
           <AlertCircle className="mx-auto h-10 w-10 text-muted-foreground/40" />
           <h3 className="mt-3 text-base font-medium">Nenhuma ocorrência ainda</h3>
           <p className="mt-1 text-sm text-muted-foreground">Quando algo acontecer no turno, registre aqui.</p>
-          <Button className="mt-4 bg-turno-600 hover:bg-turno-700" onClick={() => setOpen(true)}>
+          <Button className="mt-4 bg-app-900 hover:bg-app-800" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" /> Registrar primeira ocorrência
           </Button>
         </Card>
+      ) : listaFiltrada.length === 0 ? (
+        <Card className="p-8 text-center text-sm text-muted-foreground">Nenhuma ocorrência neste filtro.</Card>
       ) : (
-        <div className="space-y-3">
-          {lista.map((o) => (
-            <Card key={o.id} className="p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className={gravBadge(o.gravidade)}>
-                      {o.gravidade === "alta" ? "Alta" : o.gravidade === "media" ? "Média" : "Baixa"}
-                    </Badge>
-                    <Badge className={o.status === "aberta" ? "bg-amber-500" : "bg-turno-500"}>
-                      {o.status === "aberta" ? "Aberta" : "Concluída"}
-                    </Badge>
-                    {o.tipo && <span className="text-xs text-muted-foreground">{o.tipo}</span>}
+        <div className="space-y-2">
+          {listaFiltrada.map((o) => {
+            const info = gravInfo[o.gravidade];
+            const resolvida = o.status === "concluida";
+            return (
+              <Card
+                key={o.id}
+                className={`flex items-stretch gap-3 rounded-[10px] border-gray-200 p-0 pr-3 ${resolvida ? "bg-gray-50/60" : ""}`}
+              >
+                <span className={`w-1 shrink-0 rounded-l-[10px] ${info.bar}`} />
+                <div className="flex flex-1 items-center justify-between gap-3 py-3.5 min-w-0">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`truncate text-[13px] font-semibold ${resolvida ? "text-gray-400" : "text-gray-900"}`}>
+                        {o.titulo}
+                      </span>
+                      {o.tipo && <span className="shrink-0 text-xs text-muted-foreground">{o.tipo}</span>}
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-gray-400">
+                      {new Date(o.created_at).toLocaleString("pt-BR")}
+                    </div>
+                    {o.descricao && <p className="mt-1 text-xs text-muted-foreground">{o.descricao}</p>}
                   </div>
-                  <div className="mt-1.5 font-medium">{o.titulo}</div>
-                  {o.descricao && <p className="mt-1 text-sm text-muted-foreground">{o.descricao}</p>}
-                  <div className="mt-1 text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString("pt-BR")}</div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <Badge className={`rounded-md px-2 py-0.5 text-[10px] font-semibold hover:bg-inherit ${info.badge}`}>
+                      {info.label}
+                    </Badge>
+                    <button
+                      onClick={() => atualizarStatus.mutate({
+                        id: o.id,
+                        status: resolvida ? "aberta" : "concluida",
+                        equipe_id: equipe_id!,
+                      })}
+                      className="text-[11px] font-semibold text-app-600 hover:underline"
+                    >
+                      {resolvida ? "✓ Resolvido" : "Resolver →"}
+                    </button>
+                    <Button
+                      variant="ghost" size="icon" className="h-7 w-7" aria-label="Excluir"
+                      onClick={() => {
+                        if (confirm("Excluir ocorrência?"))
+                          excluir.mutate({ id: o.id, equipe_id: equipe_id! });
+                      }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost" size="icon" aria-label="Alternar status"
-                    onClick={() => atualizarStatus.mutate({
-                      id: o.id,
-                      status: o.status === "aberta" ? "concluida" : "aberta",
-                      equipe_id: equipe_id!,
-                    })}
-                  >
-                    {o.status === "aberta"
-                      ? <CheckCircle2 className="h-4 w-4 text-turno-600" />
-                      : <RotateCcw className="h-4 w-4 text-amber-600" />}
-                  </Button>
-                  <Button
-                    variant="ghost" size="icon" aria-label="Excluir"
-                    onClick={() => {
-                      if (confirm("Excluir ocorrência?"))
-                        excluir.mutate({ id: o.id, equipe_id: equipe_id! });
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -198,7 +241,7 @@ function Ocorrencias() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-              <Button type="submit" className="bg-turno-600 hover:bg-turno-700" disabled={criar.isPending}>Registrar</Button>
+              <Button type="submit" className="bg-app-900 hover:bg-app-800" disabled={criar.isPending}>Registrar</Button>
             </DialogFooter>
           </form>
         </DialogContent>

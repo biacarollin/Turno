@@ -50,7 +50,7 @@ function Cargos() {
         title="Cargos"
         subtitle="Cada cargo tem uma cor associada que aparece em toda a operação."
         actions={
-          <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => setNovoOpen(true)}>
+          <Button className="bg-app-900 hover:bg-app-800" onClick={() => setNovoOpen(true)}>
             Novo cargo
           </Button>
         }
@@ -109,7 +109,7 @@ function Cargos() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setNovoOpen(false)}>Cancelar</Button>
-            <Button className="bg-turno-600 hover:bg-turno-700" onClick={salvarNovo}>Adicionar</Button>
+            <Button className="bg-app-900 hover:bg-app-800" onClick={salvarNovo}>Adicionar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -191,7 +191,7 @@ function EditarCargoForm({ cargo, membros, onSalvar, onExcluirMembro }: {
         )}
       </div>
       <DialogFooter>
-        <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => onSalvar(nome.trim(), cor)}>
+        <Button className="bg-app-900 hover:bg-app-800" onClick={() => onSalvar(nome.trim(), cor)}>
           Salvar
         </Button>
       </DialogFooter>
