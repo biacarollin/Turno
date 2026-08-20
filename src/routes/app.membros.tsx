@@ -105,7 +105,7 @@ function Membros() {
         subtitle="Quem faz parte da equipe e o status de cada dispositivo."
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => { limparForm(); setConvidarOpen(true); }}>
+            <Button className="bg-app-900 hover:bg-app-800" onClick={() => { limparForm(); setConvidarOpen(true); }}>
               <Mail className="h-4 w-4" /> Convidar membro
             </Button>
             <Button variant="outline" onClick={() => { limparForm(); setAdicionarOpen(true); }}>
@@ -115,7 +115,7 @@ function Membros() {
         }
       />
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden rounded-xl border-gray-200 p-0">
         {isLoading ? (
           <div className="p-6 text-sm text-muted-foreground">Carregando...</div>
         ) : membros.length === 0 ? (
@@ -124,7 +124,7 @@ function Membros() {
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <thead className="bg-gray-100/70 text-left text-[10px] font-semibold uppercase tracking-wide text-gray-500">
               <tr>
                 <th className="px-4 py-2.5">Membro</th>
                 <th className="px-4 py-2.5">Cargo</th>
@@ -137,17 +137,17 @@ function Membros() {
               {membros.map((m: Membro) => {
                 const cargo = cargoDe(m.cargoId);
                 return (
-                  <tr key={m.id} className="border-t">
+                  <tr key={m.id} className="border-t border-gray-100">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-turno-100 text-xs text-turno-900">
+                          <AvatarFallback className="bg-app-600 text-xs font-bold text-app-200">
                             {m.nome.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-medium">{m.nome}</div>
-                          <div className="text-xs text-muted-foreground">{m.email}</div>
+                          <div className="text-[12px] font-semibold text-gray-900">{m.nome}</div>
+                          <div className="text-[11px] text-gray-400">{m.email}</div>
                         </div>
                       </div>
                     </td>
@@ -158,12 +158,12 @@ function Membros() {
                         </Badge>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">{m.turnoNome}</td>
+                    <td className="px-4 py-3 text-gray-600">{m.turnoNome}</td>
                     <td className="px-4 py-3">
-                      {m.dispositivo === "verificado" && <span className="inline-flex items-center gap-1.5 text-xs text-turno-700"><ShieldCheck className="h-3.5 w-3.5" /> Verificado</span>}
-                      {m.dispositivo === "inativo" && <span className="inline-flex items-center gap-1.5 text-xs text-destructive"><UserX className="h-3.5 w-3.5" /> Inativo</span>}
-                      {m.dispositivo === "pendente" && <span className="inline-flex items-center gap-1.5 text-xs text-amber-700"><ShieldAlert className="h-3.5 w-3.5" /> Pendente</span>}
-                      {m.dispositivo === "convite" && <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"><Smartphone className="h-3.5 w-3.5" /> Convite enviado</span>}
+                      {m.dispositivo === "verificado" && <span className="inline-flex items-center gap-1.5 rounded-md bg-app-100 px-2 py-0.5 text-[10px] font-semibold text-app-700"><ShieldCheck className="h-3 w-3" /> Verificado</span>}
+                      {m.dispositivo === "inativo" && <span className="inline-flex items-center gap-1.5 rounded-md bg-red-50 px-2 py-0.5 text-[10px] font-semibold text-destructive"><UserX className="h-3 w-3" /> Inativo</span>}
+                      {m.dispositivo === "pendente" && <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700"><ShieldAlert className="h-3 w-3" /> Pendente</span>}
+                      {m.dispositivo === "convite" && <span className="inline-flex items-center gap-1.5 rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500"><Smartphone className="h-3 w-3" /> Convite enviado</span>}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Button variant="ghost" size="sm" onClick={() => setEditarId(m.id)}>Editar</Button>
@@ -222,7 +222,7 @@ function Membros() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConvidarOpen(false)}>Cancelar</Button>
-            <Button className="bg-turno-600 hover:bg-turno-700" onClick={salvarConvite} disabled={adicionarMembro.isPending}>
+            <Button className="bg-app-900 hover:bg-app-800" onClick={salvarConvite} disabled={adicionarMembro.isPending}>
               {adicionarMembro.isPending ? "Gerando..." : "Gerar convite"}
             </Button>
           </DialogFooter>
@@ -275,7 +275,7 @@ function Membros() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAdicionarOpen(false)}>Cancelar</Button>
-            <Button className="bg-turno-600 hover:bg-turno-700" onClick={salvarManual} disabled={adicionarMembro.isPending}>
+            <Button className="bg-app-900 hover:bg-app-800" onClick={salvarManual} disabled={adicionarMembro.isPending}>
               {adicionarMembro.isPending ? "Salvando..." : "Concluir"}
             </Button>
           </DialogFooter>
@@ -301,7 +301,7 @@ function Membros() {
             </Button>
           </div>
           <DialogFooter>
-            <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => setLinkConvite(null)}>Fechar</Button>
+            <Button className="bg-app-900 hover:bg-app-800" onClick={() => setLinkConvite(null)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -397,7 +397,7 @@ function EditarMembroForm({ membro, cargos, onSalvar, onExcluir }: {
         <Button variant="destructive" onClick={onExcluir}>
           <Trash2 className="mr-1 h-4 w-4" /> Excluir
         </Button>
-        <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => {
+        <Button className="bg-app-900 hover:bg-app-800" onClick={() => {
           const novoStatus: Membro["dispositivo"] = ativo
             ? (membro.dispositivo === "inativo" ? "verificado" : membro.dispositivo)
             : "inativo";

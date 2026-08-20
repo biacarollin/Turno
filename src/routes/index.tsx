@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/landing/Navbar";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { ProblemSection } from "@/components/landing/ProblemSection";
+import { SegmentsSection } from "@/components/landing/SegmentsSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
-import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { CTASection } from "@/components/landing/CTASection";
-import { FAQSection } from "@/components/landing/FAQSection";
 import { Footer } from "@/components/landing/Footer";
 
 export const Route = createFileRoute("/")({
@@ -19,12 +18,11 @@ function Index() {
       <Navbar />
       <main className="flex-1">
         <HeroSection />
-        <ProblemSection />
+        <SegmentsSection />
         <FeaturesSection />
-        <HowItWorksSection />
+        <TestimonialsSection />
         <PricingSection />
         <CTASection />
-        <FAQSection />
       </main>
       <Footer />
     </div>

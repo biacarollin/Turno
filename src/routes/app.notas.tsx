@@ -63,7 +63,7 @@ function Notas() {
           </span>
         }
         actions={
-          <Button className="bg-turno-600 hover:bg-turno-700" onClick={() => setOpen(true)}>
+          <Button className="bg-app-900 hover:bg-app-800" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" /> Nova nota
           </Button>
         }
@@ -78,24 +78,36 @@ function Notas() {
           <p className="mt-1 text-sm text-muted-foreground">Use este espaço para anotações privadas sobre a equipe ou operação.</p>
         </Card>
       ) : (
-        <div className="grid gap-3 md:grid-cols-2">
-          {notas.map((n) => (
-            <Card key={n.id} className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="font-medium">{n.titulo}</div>
-                <Button variant="ghost" size="icon"
-                  onClick={() => { if (confirm("Excluir?")) excluir.mutate({ id: n.id, filial_id: n.filial_id }); }}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-              {n.conteudo && (
-                <p className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">{n.conteudo}</p>
-              )}
-              <div className="mt-2 text-xs text-muted-foreground">
-                {new Date(n.created_at).toLocaleString("pt-BR")}
-              </div>
-            </Card>
-          ))}
+        <div className="grid gap-4 md:grid-cols-2">
+          {notas.map((n) => {
+            const iniciais = n.titulo.split(/\s+/).map((s) => s[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+            return (
+              <Card key={n.id} className="rounded-xl border-gray-200 p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-app-600 text-[10px] font-bold text-app-200">
+                      {iniciais || "?"}
+                    </span>
+                    <div>
+                      <div className="text-[12px] font-semibold text-gray-900">{n.titulo}</div>
+                      <div className="text-[10px] text-gray-400">
+                        {new Date(n.created_at).toLocaleDateString("pt-BR")}
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7"
+                    onClick={() => { if (confirm("Excluir?")) excluir.mutate({ id: n.id, filial_id: n.filial_id }); }}>
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  </Button>
+                </div>
+                {n.conteudo && (
+                  <p className="mt-3 border-t border-gray-100 pt-3 text-[12px] leading-relaxed text-gray-700 whitespace-pre-wrap">
+                    {n.conteudo}
+                  </p>
+                )}
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -140,7 +152,7 @@ function Notas() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-              <Button type="submit" className="bg-turno-600 hover:bg-turno-700" disabled={criar.isPending}>Salvar</Button>
+              <Button type="submit" className="bg-app-900 hover:bg-app-800" disabled={criar.isPending}>Salvar</Button>
             </DialogFooter>
           </form>
         </DialogContent>

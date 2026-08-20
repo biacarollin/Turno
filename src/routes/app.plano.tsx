@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Lock, ArrowUpRight, ExternalLink, Loader2 } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PLANOS, planoPor, type PlanoId } from "@/lib/plano";
 import { useSession } from "@/hooks/use-session";
@@ -76,54 +76,51 @@ function Plano() {
       />
 
       {/* Card do plano ativo */}
-      <Card className="overflow-hidden border-turno-200 bg-white text-turno-900">
+      <Card className="overflow-hidden rounded-2xl border-2 border-app-500 bg-app-900 text-white">
         <div className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <Badge className="bg-turno-100 text-turno-800">
-                <Lock className="mr-1 h-3 w-3" /> Plano ativo
+              <Badge className="rounded-full bg-app-500 px-3 py-1 text-[11px] font-semibold text-gray-900 hover:bg-app-500">
+                {planoAtivo.nome}
               </Badge>
-              <h2 className="mt-2 text-2xl font-medium">{planoAtivo.nome}</h2>
-              <p className="mt-1 text-sm text-turno-900/60">{planoAtivo.membros}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-3xl font-medium">{planoAtivo.preco}</div>
-              <div className="mt-1 text-xs text-turno-900/60">
-                {emTrial && trialEnd
-                  ? `Trial gratuito até ${trialEnd}`
-                  : proximaCobranca
-                  ? `Próxima cobrança · ${proximaCobranca}`
-                  : "Sem cobrança · uso ilimitado"}
+              <div className="mt-3 text-[36px] font-extrabold tracking-[-1px]">
+                {planoAtivo.preco}
               </div>
+              <p className="mt-1 text-sm text-gray-400">{planoAtivo.membros}</p>
+            </div>
+            <div className="text-right text-xs text-gray-400">
+              {emTrial && trialEnd
+                ? `Trial gratuito até ${trialEnd}`
+                : proximaCobranca
+                ? `Próxima cobrança: ${proximaCobranca}`
+                : "Sem cobrança · uso ilimitado"}
             </div>
           </div>
 
           <div className="mt-6">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm text-gray-300">
               <span>Membros</span>
               <span className="font-mono">{usados} / {totalMembros || "∞"}</span>
             </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-turno-100">
-              <div className="h-full bg-turno-600" style={{ width: `${pct}%` }} />
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-app-700">
+              <div className="h-full bg-app-500" style={{ width: `${pct}%` }} />
             </div>
           </div>
 
           {isPago && (
-            <div className="mt-6 border-t border-turno-100 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-turno-300 text-turno-900"
+            <div className="mt-6 border-t border-app-700 pt-4">
+              <button
                 onClick={() => portalMutation.mutate()}
                 disabled={portalMutation.isPending}
+                className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-app-400 hover:underline disabled:opacity-60"
               >
                 {portalMutation.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <ExternalLink className="mr-2 h-4 w-4" />
+                  <ExternalLink className="h-3.5 w-3.5" />
                 )}
                 Gerenciar assinatura, faturas e cartão
-              </Button>
+              </button>
             </div>
           )}
         </div>

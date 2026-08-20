@@ -66,7 +66,7 @@ function Turnos() {
         title="Turnos"
         subtitle="Defina janelas, notificações antecipadas e limite pós-encerramento."
         actions={
-          <Button className="bg-turno-600 hover:bg-turno-700" onClick={abrirNovo}>
+          <Button className="bg-app-900 hover:bg-app-800" onClick={abrirNovo}>
             Novo turno
           </Button>
         }
@@ -87,13 +87,13 @@ function Turnos() {
                 <div className="text-base font-medium">{t.nome}</div>
                 <div className="mt-1 font-mono text-sm text-muted-foreground">{t.inicio} – {t.fim}</div>
               </div>
-              <Badge className={t.ativo ? "bg-turno-500" : "bg-muted text-muted-foreground"}>
+              <Badge className={t.ativo ? "bg-app-500" : "bg-muted text-muted-foreground"}>
                 {t.ativo ? "Ativo" : "Inativo"}
               </Badge>
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {t.cargos.map((c) => (
-                <Badge key={c} variant="secondary" className="bg-turno-50 text-turno-800">{c}</Badge>
+                <Badge key={c} variant="secondary" className="bg-app-100 text-app-700">{c}</Badge>
               ))}
             </div>
             <div className="mt-4 space-y-2 border-t pt-4 text-sm">
@@ -164,7 +164,7 @@ function Turnos() {
             )}
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-              <Button className="bg-turno-600 hover:bg-turno-700" onClick={salvar}>Salvar</Button>
+              <Button className="bg-app-900 hover:bg-app-800" onClick={salvar}>Salvar</Button>
             </div>
           </DialogFooter>
         </DialogContent>

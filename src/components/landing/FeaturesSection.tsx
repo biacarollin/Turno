@@ -1,67 +1,55 @@
-import { Clock, Check, Bell, User } from "lucide-react";
+import { Zap, PenLine, ClipboardList, Users } from "lucide-react";
 
 const features = [
   {
-    icon: Clock,
-    title: "Resumo inteligente por IA",
+    icon: Zap,
+    iconBg: "bg-amber-100",
+    title: "Log de ocorrências",
     description:
-      "Ao encerrar o turno, a IA gera automaticamente um resumo das ocorrências em linguagem natural. O próximo profissional lê em segundos e já sabe o que precisa de atenção.",
-    highlight: true,
+      "Registre ocorrências com tipo, gravidade (baixa/média/alta) e local. Pendências destacadas no dashboard para o gestor.",
   },
   {
-    icon: Check,
-    title: "Assinatura digital rastreável",
+    icon: PenLine,
+    iconBg: "bg-app-100",
+    title: "Assinatura digital",
     description:
-      "Cada passagem é assinada com hash criptográfico, IP e dados do dispositivo. Rastreabilidade completa para auditorias e conformidade com a LGPD.",
+      "PIN de 4 dígitos + hash SHA-256 do conteúdo. Trilha de auditoria: responsável, horário e IP.",
   },
   {
-    icon: Bell,
-    title: "Pendências que não se perdem",
+    icon: ClipboardList,
+    iconBg: "bg-blue-100",
+    title: "Histórico completo",
     description:
-      "Ocorrências não resolvidas migram automaticamente para o turno seguinte com histórico completo — nada fica esquecido na troca de equipe.",
+      "Todas as passagens ficam registradas com resumo, assinatura e data — acessíveis a qualquer momento.",
   },
   {
-    icon: User,
-    title: "Gestão de equipe e cargos",
+    icon: Users,
+    iconBg: "bg-violet-100",
+    title: "Gestão de equipe",
     description:
-      "Cadastre cargos, associe membros, gerencie turnos, folgas e trocas. Notas privadas para o gestor registrar feedbacks individuais com sigilo.",
+      "Membros, cargos e turnos configuráveis. Convite por link, aprovação de folgas e notas privadas por colaborador.",
   },
 ];
 
 export function FeaturesSection() {
   return (
-    <section id="funcionalidades" className="w-full bg-muted/40 py-20 md:py-28">
-      <div className="mx-auto max-w-5xl px-4 md:px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-[2.5rem]">
-            Tudo que sua equipe precisa
-          </h2>
-          <p className="mt-3 text-muted-foreground">
-            Do registro à assinatura — rastreável, seguro e acessível.
-          </p>
-        </div>
+    <section id="funcionalidades" className="w-full bg-gray-100 py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-4 md:px-6">
+        <span className="text-[10px] font-semibold uppercase tracking-[2px] text-app-600">
+          Funcionalidades
+        </span>
+        <h2 className="mt-3 max-w-2xl text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          Tudo que uma passagem de turno precisa ter
+        </h2>
 
-        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
-            <div
-              key={f.title}
-              className={`rounded-2xl border p-7 transition-all ${
-                f.highlight
-                  ? "border-turno-400/40 bg-turno-50"
-                  : "border-border bg-card"
-              }`}
-            >
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                  f.highlight ? "bg-primary text-white" : "bg-turno-50 text-primary"
-                }`}
-              >
-                <f.icon className="h-5 w-5" />
+            <div key={f.title} className="rounded-2xl border border-gray-200 bg-white p-6">
+              <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${f.iconBg}`}>
+                <f.icon className="h-5 w-5 text-app-700" />
               </div>
-              <h3 className="mt-5 text-lg font-semibold text-foreground">{f.title}</h3>
-              <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
-                {f.description}
-              </p>
+              <h3 className="mt-6 text-[17px] font-bold tracking-tight text-gray-900">{f.title}</h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-gray-600">{f.description}</p>
             </div>
           ))}
         </div>
