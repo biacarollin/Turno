@@ -1,162 +1,85 @@
-# Turno — Gestão de Passagem de Turno Digital
+# Turno
 
-> Projeto de portfólio desenvolvido de forma independente com auxílio de IA.  
-> Stack: TanStack Start · React 19 · TypeScript · Supabase · Stripe · Tailwind v4
+Plataforma de gestão de passagem de turno para equipes que trabalham em regime de rodízio. Substitui WhatsApp e papel por registros digitais com assinatura, IA e histórico rastreável.
 
----
+Projeto de portfólio desenvolvido de forma independente com auxílio de IA.
 
-## O que é
+**Stack:** TanStack Start v1 · React 19 · TypeScript · Tailwind v4 · Supabase · Stripe · Claude API
 
-O Turno substitui WhatsApp e papel na comunicação entre equipes que trabalham em turnos — saúde, logística, hotelaria e segurança. O colaborador que encerra o turno registra ocorrências, gera um resumo e assina digitalmente. O próximo turno entra sabendo exatamente o que aconteceu e o que está pendente.
+## O problema
 
-**Problema real:** equipes que trabalham em rodízio perdem informação crítica na troca de turno. Uma ocorrência não comunicada pode causar desde retrabalho até acidentes. WhatsApp não tem rastreabilidade, papel não tem busca, planilha não tem assinatura.
+Equipes em rodízio perdem informação na troca de turno. Uma ocorrência não comunicada vira retrabalho ou acidente. WhatsApp não tem rastreabilidade, papel não tem busca, planilha não tem assinatura.
 
----
+## O que foi implementado
 
-## Funcionalidades implementadas
+**Passagem de turno**
+- Encerramento com formulário de passagem e resumo gerado por IA
+- Assinatura digital via PIN de 4 dígitos + hash SHA-256 do conteúdo
+- Histórico com filtro por período, limitado conforme o plano
 
-### Gestão de turnos
-- Criação e configuração de turnos com horários, cargos associados e limites de notificação
-- Encerramento de turno com formulário de passagem
-- Assinatura digital com PIN de 4 dígitos + hash SHA-256 do conteúdo — trilha de auditoria completa
-- Histórico de passagens com filtro por período (limitado por plano)
+**Ocorrências**
+- Registro com tipo, gravidade e local
+- Ocorrências críticas destacadas automaticamente no dashboard
 
-### Ocorrências
-- Registro com tipo, gravidade (baixa / média / alta) e local
-- Destaque automático de ocorrências críticas no dashboard
-- Associação de ocorrências à passagem de turno
+**Dashboard do gestor**
+- Resumos das passagens do dia (Claude API) como primeiro elemento da tela
+- Aprovação de folgas e trocas direto no painel
+- KPIs de turnos, ocorrências e assinaturas
 
-### Dashboard do gestor
-- Resumos das passagens do dia gerados por IA — primeiro elemento visível ao entrar
-- Cards com status automático por gravidade máxima das ocorrências
-- KPIs: turnos ativos, ocorrências abertas, passagens assinadas
-- Aprovação de folgas e trocas de turno direto no dashboard
+**Equipes e membros**
+- Convite por link, cargos configuráveis, gestão de folgas
+- Fluxo de convite completo testado de ponta a ponta
 
-### Membros e equipes
-- CRUD completo de membros com convite por link
-- Fluxo de convite → conta real → entrada na equipe correta (4 bugs corrigidos em cadeia)
-- Cargos com cores configuráveis
-- Gestão de folgas e trocas com aprovação do gestor
-
-### Planos e cobrança
+**Planos e cobrança**
 - 3 planos: Grátis / Básico R$69 / Equipe R$159
-- Checkout real via Stripe com trial de 7 dias
-- Customer Portal para gestão de assinatura
-- Webhook processando `checkout.session.completed` e updates
-- Guards de plano no banco via migration — não dá pra burlar por URL
+- Stripe com checkout real, Customer Portal e webhook
+- Guards de plano aplicados no banco via migration
 
-### Colaborador
-- Tela separada e simplificada (não vê o painel do gestor)
-- Solicitação de folga e troca de turno com aprovação do gestor
-- Visualização da passagem recebida com resumo da IA
+**Colaborador**
+- Tela separada com visão simplificada
+- Solicitação de folga e troca com aprovação do gestor
 
----
+## Stack
 
-## Decisões de produto documentadas
+```
+Frontend    TanStack Start v1, React 19, TypeScript, Tailwind v4, shadcn/ui
+Backend     Supabase (PostgreSQL + RLS + Auth)
+Pagamento   Stripe (Checkout, Customer Portal, Webhooks)
+IA          Claude API, resumo automático de passagem de turno
+Design      Figma, design system, landing page, dashboard, app mobile
+```
 
-### Por que 3 planos e não 5
-O modelo inicial tinha Profissional e Enterprise. Cortados antes do lançamento porque nenhuma das features prometidas (multi-filial, hierarquia de papéis, exportação PDF) estava implementada. Vender o que não existe é pior do que ter um catálogo menor e honesto.
+## Arquitetura
 
-### Por que "Resumo por IA" e não "Chat com IA"
-Chat livre com IA em plano Grátis = custo recorrente ilimitado sem receita. O resumo automático ao encerrar turno é um caso de uso fechado: 1 chamada de LLM, contexto definido (ocorrências do turno), resultado útil e previsível. Esse é o diferencial real do produto.
+```
+Organização
+  └── Filial
+        ├── Gestor, acesso total à filial
+        └── Colaborador, acesso simplificado
+```
 
-### Por que cortar hierarquia de papéis (diretor / gerente / gestor)
-RBAC multi-nível cruzado com multi-unidade é essencialmente um segundo produto. Não existia nada no schema. Mantido só 2 papéis: gestor (acesso total à unidade) e colaborador (acesso simplificado). Diretor multi-unidade fica para quando houver cliente real pedindo.
+Row Level Security no Supabase garante isolamento entre organizações.
 
-### Por que não subir em produção
-O deploy no Cloudflare Workers tem incompatibilidade estrutural com o plugin do Vite — o CSS não renderiza em produção. A solução é migrar para Vercel, que suporta TanStack Start nativamente. Decisão: pausar o projeto antes de investir mais tempo em infraestrutura sem tração de clientes.
+## Decisões de produto
 
-### Por que não construir o app mobile nativo
-React Native / Expo = projeto separado, build, publicação nas lojas, custo de US$25 na Play Store e revisão da Apple. Para o MVP, uma página web responsiva com login leve resolve 90% do valor por 10% do esforço. App nativo só depois de tração.
+**Resumo por IA em vez de chat livre**
+Chat aberto em todos os planos gera custo por token sem controle. O resumo ao encerrar turno é um caso fechado: uma chamada de API com contexto definido pelas ocorrências do turno.
 
----
+**Assinatura digital sem plataforma externa**
+PIN + hash SHA-256 + metadata de auditoria. Sem custo adicional, sem dependência de terceiro, sem necessidade de CNPJ.
 
-## O que ficou para depois (e por quê)
+**Guards no banco, não no frontend**
+Limites de equipes, membros e histórico aplicados via migration. Não tem como burlar por URL.
 
-| Feature | Motivo do corte |
+## O que ficou para depois
+
+| Feature | Situação |
 |---|---|
-| Multi-filial | Schema não implementado, complexidade alta, nenhum cliente pediu ainda |
-| Hierarquia de papéis completa | RBAC multi-nível = segundo produto |
-| Exportação PDF | Baixo impacto no early adoption, era feature do plano Profissional que foi cortado |
-| App mobile nativo | Custo e complexidade desproporcionais para o estágio atual |
-| Alertas de IA | Vago demais, custo imprevisível, não implementado |
-| Envio automático de convite por e-mail | Mantido como link manual para simplificar o fluxo inicial |
+| Multi-filial | Não implementado |
+| App mobile nativo | Não implementado |
+| Exportação PDF | Não implementado |
+| Testes E2E com Cypress | Em andamento |
 
----
+## Segmentos
 
-## Stack técnica
-
-```
-Frontend:    TanStack Start v1, React 19, TypeScript, Tailwind v4, shadcn/ui
-Backend:     Supabase (PostgreSQL + RLS + Auth + Storage)
-Pagamento:   Stripe (Checkout, Customer Portal, Webhooks)
-IA:          Claude API (Anthropic) — resumo de passagem de turno
-Deploy:      Cloudflare Workers (bug de CSS — migração para Vercel pendente)
-Design:      Figma (design system, landing page, dashboard, app mobile)
-```
-
----
-
-## Arquitetura multi-tenant
-
-```
-Organização (empresa)
-  └── Filial (unidade — ex: UPA-001, UPA-002)
-        ├── Gestor → acesso total à filial
-        │     ├── Equipes
-        │     ├── Membros
-        │     ├── Passagens
-        │     └── Ocorrências
-        └── Colaborador → acesso simplificado
-              ├── Ver passagem recebida
-              ├── Registrar ocorrência
-              └── Solicitar folga / troca
-```
-
-Row Level Security (RLS) no Supabase garante isolamento total entre organizações — nenhuma query retorna dados de outra empresa.
-
----
-
-## Design
-
-O projeto tem um design system completo desenvolvido no Figma:
-- Paleta de cores com tokens (`green/500: #399B59`, `green/900: #0F1E15`)
-- Landing page com hero, segmentos, features, depoimentos e pricing
-- Dashboard do gestor com 6 telas (Dashboard, Passagens, Ocorrências, Membros, Notas, Plano)
-- App mobile do colaborador com 7 telas + 5 estados do card de passagem de plantão
-- Tela de login web em duas colunas
-
----
-
-## Como rodar localmente
-
-```bash
-# Instalar dependências
-npm install
-
-# Configurar variáveis de ambiente
-cp .env.example .env
-# Preencher com suas chaves do Supabase, Stripe e Anthropic
-
-# Rodar em desenvolvimento
-npm run dev
-```
-
-> **Nota:** o projeto usa Supabase como banco. Você vai precisar de um projeto próprio no supabase.com e rodar as migrations em `supabase/migrations/`.
-
----
-
-## Contexto do projeto
-
-Desenvolvido de forma independente ao longo de vários meses como produto SaaS real, desde a concepção até implementação. Todo o processo — decisões de produto, design, desenvolvimento frontend e backend, integração de pagamentos — foi feito por uma pessoa só com auxílio de ferramentas de IA.
-
-O projeto está pausado e foi convertido em portfólio. Os próximos passos planejados são implementação de testes com Cypress e documentação técnica aprofundada.
-
----
-
-## Segmentos-alvo
-
-- **Saúde:** UTI, enfermagem, farmácia hospitalar — rastreabilidade clínica
-- **Logística:** almoxarifado, transporte, centro de distribuição — controle por turno
-- **Hotelaria:** recepção, governança, manutenção — pendências sem depender de WhatsApp
-- **Segurança:** portaria, rondas — registro com timestamp e assinatura
+Saúde, logística, hotelaria e segurança. Qualquer operação com equipes em rodízio.
