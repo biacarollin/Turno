@@ -1,0 +1,125 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  --color-turno-50: #f0f9f6;
+  --color-turno-100: #d9f0ea;
+  --color-turno-200: #b3e0d5;
+  --color-turno-300: #7cc9b8;
+  --color-turno-400: #4aad98;
+  --color-turno-500: #2a917a;
+  --color-turno-600: #1f7563;
+  --color-turno-700: #1a5e50;
+  --color-turno-800: #174b41;
+  --color-turno-900: #143e37;
+  --color-turno-950: #04342c;
+
+  /* Paleta do shell do app (sidebar escura + acentos), do Design System no Figma */
+  --color-app-950: #0a1610;
+  --color-app-900: #0f1e15;
+  --color-app-800: #162b1e;
+  --color-app-700: #1e3d2a;
+  --color-app-600: #2a5c3c;
+  --color-app-500: #399b59;
+  --color-app-400: #5bc47a;
+  --color-app-300: #8edba4;
+  --color-app-200: #bef0cc;
+  --color-app-100: #e2f7e9;
+  --color-app-50: #f0faf4;
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #04342c;
+  --primary-foreground: #faf9f6;
+  --secondary: #f0f9f6;
+  --secondary-foreground: #04342c;
+  --muted: #f1f5f4;
+  --muted-foreground: #64748b;
+  --accent: #4aad98;
+  --accent-foreground: #04342c;
+  --destructive: #dc2626;
+  --destructive-foreground: #faf9f6;
+  --border: #e2e8e0;
+  --input: #e2e8e0;
+  --ring: #4aad98;
+
+  --sidebar: #0f1e15;
+  --sidebar-foreground: #e5e7eb;
+  --sidebar-border: #1e3d2a;
+  --sidebar-ring: #5bc47a;
+  --sidebar-accent: #162b1e;
+  --sidebar-accent-foreground: #ffffff;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

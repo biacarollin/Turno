@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turno — Gestão de Passagem de Turno Digital</title>
+  <meta name="description" content="Projeto de portfólio SaaS B2B para gestão de passagem de turno digital. TanStack Start, Supabase, Stripe, Claude API." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-900: #0C1A10;
+      --green-800: #162B1E;
+      --green-600: #2A5C3C;
+      --green-500: #399B59;
+      --green-400: #5BC47A;
+      --green-200: #BEF0CC;
+      --gray-900: #111827;
+      --gray-600: #4B5563;
+      --gray-400: #9CA3AF;
+      --gray-100: #F3F4F6;
+      --white: #FFFFFF;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--green-900);
+      color: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      position: sticky;
+      top: 0;
+      background: rgba(12,26,16,.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 5px);
+      gap: 3px;
+    }
+    .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--green-400);
+    }
+    .dot.d { opacity: .2; }
+    .dot.m { opacity: .45; }
+    .logo-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -.3px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: var(--gray-400);
+      text-decoration: none;
+      transition: color .15s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-btn {
+      background: var(--green-500);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .nav-btn:hover { background: var(--green-600); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(57,155,89,.12), transparent),
+        radial-gradient(ellipse 40% 30% at 20% 20%, rgba(91,196,122,.06), transparent);
+      pointer-events: none;
+    }
+    /* Grid texture */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(57,155,89,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57,155,89,.07) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 720px; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(91,196,122,.1);
+      border: 1px solid rgba(91,196,122,.2);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green-400);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+    }
+    .hero h1 span { color: var(--green-400); }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--gray-400);
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-500);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 12px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+    }
+    .btn-primary:hover { background: var(--green-600); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--gray-400);
+      font-size: 15px;
+      font-weight: 500;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.1);
+      text-decoration: none;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,.3); color: var(--white); }
+
+    /* Stats */
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      flex-wrap: wrap;
+    }
+    .stat-v {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -.5px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-l { font-size: 12px; color: var(--gray-600); }
+
+    /* ── STACK SECTION ── */
+    .section {
+      padding: 80px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green-500);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section h2 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700;
+      letter-spacing: -.5px;
+      margin-bottom: 48px;
+      color: var(--white);
+    }
+
+    /* Stack grid */
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .stack-card {
+      background: var(--green-800);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stack-card-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-600);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .stack-card-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.5;
+    }
+
+    /* ── FEATURES ── */
+    .features-bg {
+      background: var(--green-800);
+      border-top: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 24px;
+      transition: border-color .15s;
+    }
+    .feature-card:hover { border-color: rgba(91,196,122,.3); }
+    .feature-ico {
+      width: 40px; height: 40px;
+      background: rgba(57,155,89,.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 13px;
+      color: var(--gray-400);
+      line-height: 1.65;
+    }
+
+    /* ── DECISIONS ── */
+    .decisions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .decision-item {
+      background: var(--green-800);
+      border: 1px solid rgba(255,255,255,.06);
+      border-left: 3px solid var(--green-500);
+      border-radius: 0 12px 12px 0;
+      padding: 20px 24px;
+    }
+    .decision-item h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+    .decision-item p {
+      font-size: 13px;
+      color: var(--gray-400);
+      line-height: 1.65;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: var(--green-800);
+      border-top: 1px solid rgba(255,255,255,.06);
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .cta-section h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -.4px;
+      margin-bottom: 12px;
+    }
+    .cta-section p {
+      font-size: 15px;
+      color: var(--gray-400);
+      margin-bottom: 32px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #060D08;
+      border-top: 1px solid rgba(255,255,255,.04);
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer p { font-size: 13px; color: var(--gray-600); }
+    footer a { color: var(--gray-400); text-decoration: none; }
+    footer a:hover { color: var(--white); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .section { padding: 60px 20px; }
+      .hero { padding: 60px 20px; }
+      .hero-stats { gap: 32px; }
+      footer { padding: 24px 20px; flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">
+      <div class="logo-grid">
+        <div class="dot d"></div><div class="dot m"></div><div class="dot d"></div>
+        <div class="dot m"></div><div class="dot"></div><div class="dot m"></div>
+        <div class="dot d"></div><div class="dot m"></div><div class="dot d"></div>
+      </div>
+      <span class="logo-text">turno</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#funcionalidades">Funcionalidades</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#decisoes">Decisões</a></li>
+    </ul>
+    <a href="https://github.com/biacarollin/Turno" target="_blank" class="nav-btn">
+      Ver repositório →
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">✦ Projeto de portfólio · SaaS B2B</div>
+      <h1>Cada turno,<br><span>registrado.</span></h1>
+      <p class="hero-sub">
+        Plataforma de gestão de passagem de turno digital para equipes de saúde, logística, hotelaria e segurança. Substitui WhatsApp e papel por registros com assinatura digital, IA e rastreabilidade total.
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/biacarollin/Turno" target="_blank" class="btn-primary">
+          ⭐ Ver no GitHub
+        </a>
+        <a href="#funcionalidades" class="btn-secondary">
+          Explorar o projeto
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-v">Multi-tenant</div>
+          <div class="stat-l">Org → Filial → Equipe</div>
+        </div>
+        <div>
+          <div class="stat-v">Stripe</div>
+          <div class="stat-l">Checkout + Webhooks reais</div>
+        </div>
+        <div>
+          <div class="stat-v">RLS</div>
+          <div class="stat-l">Row Level Security no banco</div>
+        </div>
+        <div>
+          <div class="stat-v">Claude API</div>
+          <div class="stat-l">Resumo por IA integrado</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section class="section" id="stack">
+    <div class="section-label">Stack técnica</div>
+    <h2>Construído com tecnologias modernas</h2>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="stack-card-label">Frontend</div>
+        <div class="stack-card-value">TanStack Start v1<br>React 19 · TypeScript<br>Tailwind v4 · shadcn/ui</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-label">Backend & Banco</div>
+        <div class="stack-card-value">Supabase (PostgreSQL)<br>RLS · Auth · Storage<br>Migrations versionadas</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-label">Pagamento</div>
+        <div class="stack-card-value">Stripe Checkout<br>Customer Portal<br>Webhooks · 3 planos</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-label">Inteligência Artificial</div>
+        <div class="stack-card-value">Claude API (Anthropic)<br>Resumo automático<br>de passagem de turno</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-label">Design</div>
+        <div class="stack-card-value">Figma completo<br>Design system + tokens<br>Landing · Dashboard · App</div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-label">Arquitetura</div>
+        <div class="stack-card-value">Multi-tenant<br>Guards de plano no banco<br>Server functions seguras</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div class="features-bg" id="funcionalidades">
+    <section class="section">
+      <div class="section-label">Funcionalidades</div>
+      <h2>O que foi implementado</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-ico">✍️</div>
+          <h3>Assinatura digital</h3>
+          <p>PIN de 4 dígitos + hash SHA-256 do conteúdo. Trilha de auditoria completa com responsável, horário e data.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-ico">✦</div>
+          <h3>Resumo por IA</h3>
+          <p>Claude API gera resumo automático das ocorrências ao encerrar o turno. Visível no dashboard do gestor.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-ico">⚡</div>
+          <h3>Log de ocorrências</h3>
+          <p>Registro com tipo, gravidade (baixa/média/alta) e local. Pendências críticas destacadas automaticamente.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-ico">👥</div>
+          <h3>Gestão de equipes</h3>
+          <p>CRUD de membros com convite por link, cargos configuráveis, folgas e trocas de turno com aprovação.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-ico">💳</div>
+          <h3>Planos e cobrança</h3>
+          <p>3 planos com Stripe real. Guards de plano no banco via migration — não dá pra burlar por URL.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-ico">🔒</div>
+          <h3>Multi-tenant seguro</h3>
+          <p>RLS no Supabase garante isolamento total entre organizações. Nenhuma query vaza dados entre empresas.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- DECISIONS -->
+  <section class="section" id="decisoes">
+    <div class="section-label">Decisões de produto</div>
+    <h2>Por que cada escolha foi feita</h2>
+    <div class="decisions-list">
+      <div class="decision-item">
+        <h3>"Resumo por IA" em vez de "Chat com IA"</h3>
+        <p>Chat livre com IA em todos os planos = custo recorrente por usuário sem controle. O resumo automático ao encerrar turno é um caso de uso fechado: 1 chamada de LLM, contexto definido pelas ocorrências do turno, resultado útil e previsível. Diferencial real do produto.</p>
+      </div>
+      <div class="decision-item">
+        <h3>Assinatura digital sem plataforma externa</h3>
+        <p>PIN de 4 dígitos com bcrypt + hash SHA-256 do conteúdo + metadata de auditoria (responsável, horário, IP). Zero custo adicional, sem dependência de terceiros, sem necessidade de CNPJ para integrar.</p>
+      </div>
+      <div class="decision-item">
+        <h3>Guards de plano no banco, não no frontend</h3>
+        <p>Limites de equipes, membros e histórico aplicados via migration no Supabase. Não dá para burlar por URL ou manipulação de cliente — a restrição existe na camada de dados.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2>Projeto de portfólio aberto</h2>
+    <p>Código completo disponível no GitHub — stack, migrations, design system e decisões documentadas.</p>
+    <a href="https://github.com/biacarollin/Turno" target="_blank" class="btn-primary">
+      Ver repositório completo →
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">
+      <div class="logo-grid">
+        <div class="dot d"></div><div class="dot m"></div><div class="dot d"></div>
+        <div class="dot m"></div><div class="dot"></div><div class="dot m"></div>
+        <div class="dot d"></div><div class="dot m"></div><div class="dot d"></div>
+      </div>
+      <span class="logo-text">turno</span>
+    </div>
+    <p>Desenvolvido por <a href="https://github.com/biacarollin" target="_blank">Biacarollin</a> · Projeto de portfólio · 2026</p>
+  </footer>
+
+</body>
+</html>
