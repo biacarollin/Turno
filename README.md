@@ -87,4 +87,4 @@ Processo completo de testes, casos documentados e bugs encontrados em [turno-qa-
 
 ---
 
-Feito por biacarollin 🤖
+Feito por biacarollin 🖤
