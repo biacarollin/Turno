@@ -1,15 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertCircle, CheckCircle2, Clock, Plus, ShieldCheck, ArrowRight } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Plus, ShieldCheck, ArrowRight, Repeat, Check, X, CalendarDays } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useOcorrencias, useAtualizarStatusOcorrencia } from "@/stores/ocorrencias";
 import { useMembros, useTurnos } from "@/stores/equipe";
-import { useFolgas } from "@/stores/folgas";
+import { useFolgas, useAtualizarStatusFolga } from "@/stores/folgas";
 import { usePassagens } from "@/stores/passagens";
 import { useSession, useMinhasEquipes } from "@/hooks/use-session";
 import { findSegmento } from "@/lib/segmentos";
+import { dataLocal, formatDataBR, hojeISO } from "@/lib/data";
+import { ResumosHoje } from "@/components/app/ResumosHoje";
 
 export const Route = createFileRoute("/app/")({
   component: Dashboard,
@@ -41,6 +43,7 @@ function Dashboard() {
   const { data: membros = [] } = useMembros(equipe_id);
   const { data: turnos = [] } = useTurnos(equipe_id);
   const { data: folgas = [] } = useFolgas(filial_id);
+  const atualizarStatusFolga = useAtualizarStatusFolga();
   const { data: passagens = [] } = usePassagens(equipe_id);
 
   const seg = findSegmento(sessao?.segmento ?? null);
@@ -51,13 +54,15 @@ function Dashboard() {
   const criticaPendente = ocorrencias.some((o) => o.status === "aberta" && o.gravidade === "alta");
 
   const assinadasHoje = passagens.filter((p) => {
-    const hoje = new Date().toDateString();
-    return p.hash_assinatura && new Date(p.data).toDateString() === hoje;
+    return p.hash_assinatura && p.data.slice(0, 10) === hojeISO();
   }).length;
 
   const urgentes = ocorrencias.filter(
     (o) => o.status === "aberta" && o.gravidade === "alta",
   );
+
+  const folgasPendentes = folgas.filter((f) => f.status === "pendente");
+  const nomeMembroFolga = (id: string | null) => membros.find((m) => m.id === id)?.nome || "—";
 
   const abertasOrdenadas = ocorrencias
     .filter((o) => o.status === "aberta")
@@ -95,6 +100,8 @@ function Dashboard() {
             : "Visão geral da sua operação"
         }
       />
+
+      <ResumosHoje equipeIds={equipes.map((e) => e.equipe_id)} />
 
       {urgentes.length > 0 && (
         <Card className="border-amber-300 bg-amber-50/60 p-5">
@@ -138,6 +145,61 @@ function Dashboard() {
                 >
                   <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Concluir
                 </Button>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {folgasPendentes.length > 0 && (
+        <Card className="border-blue-200 bg-blue-50/60 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-blue-700" />
+              <h2 className="text-base font-semibold text-blue-800">
+                {folgasPendentes.length} solicitação{folgasPendentes.length > 1 ? "ões" : ""} de folga/troca pendente{folgasPendentes.length > 1 ? "s" : ""}
+              </h2>
+            </div>
+            <Link to="/app/folgas">
+              <Button variant="ghost" size="sm" className="text-blue-700 hover:text-blue-800">Ver todas</Button>
+            </Link>
+          </div>
+          <ul className="space-y-2">
+            {folgasPendentes.slice(0, 5).map((f) => (
+              <li
+                key={f.id}
+                className="flex items-center justify-between gap-3 rounded-md border border-blue-200 bg-background p-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 truncate text-sm font-medium">
+                    {f.tipo === "troca" && <Repeat className="h-3.5 w-3.5 shrink-0 text-blue-600" />}
+                    {f.tipo === "troca"
+                      ? `${nomeMembroFolga(f.membro_id)} ⇄ ${nomeMembroFolga(f.membro_troca_id)}`
+                      : nomeMembroFolga(f.membro_id)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatDataBR(f.data_inicio)} – {formatDataBR(f.data_fim)}
+                    {f.motivo && ` · ${f.motivo}`}
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                    onClick={() => atualizarStatusFolga.mutate({ id: f.id, status: "aprovada", filial_id: f.filial_id })}
+                  >
+                    <Check className="mr-1 h-3.5 w-3.5" /> Aprovar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => atualizarStatusFolga.mutate({ id: f.id, status: "recusada", filial_id: f.filial_id })}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </li>
             ))}
           </ul>
@@ -242,7 +304,7 @@ function Dashboard() {
                     <li key={p.id} className="flex items-center justify-between gap-3 py-2.5">
                       <div className="min-w-0">
                         <div className="truncate text-xs font-semibold text-gray-900">
-                          {new Date(p.data).toLocaleDateString("pt-BR")}
+                          {formatDataBR(p.data)}
                         </div>
                         <div className="truncate text-[11px] text-gray-400">
                           {p.assinado_por || "Sem assinatura"}

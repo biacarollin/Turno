@@ -26,6 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useSession } from "@/hooks/use-session";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const operacao = [
@@ -124,7 +125,7 @@ export function AppSidebar() {
             T
           </span>
           {!collapsed && (
-            <span className="text-[15px] font-semibold tracking-[-0.4px] text-white">turno</span>
+            <span className="text-[15px] font-semibold tracking-[-0.4px] text-white">Turno</span>
           )}
         </Link>
         {!collapsed && (
@@ -155,9 +156,10 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              onClick={() => {
+              onClick={async () => {
+                await supabase.auth.signOut();
                 toast.success("Você saiu da conta.");
-                navigate({ to: "/" });
+                navigate({ to: "/login" });
               }}
               className="text-gray-500 hover:bg-app-800 hover:text-red-400"
             >

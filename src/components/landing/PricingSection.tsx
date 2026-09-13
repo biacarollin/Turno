@@ -27,7 +27,7 @@ const plans: Plan[] = [
     priceAnnualFull: "0",
     annualEquivalent: "0",
     seats: "Até 3 membros",
-    features: ["1 equipe", "Até 5 membros", "Log de ocorrências", "Chat com IA"],
+    features: ["1 equipe", "Até 5 membros", "Log de ocorrências", "Histórico 7 dias"],
     cta: "Começar grátis",
   },
   {
@@ -38,7 +38,7 @@ const plans: Plan[] = [
     priceAnnualFull: "828",
     annualEquivalent: "57",
     seats: "Até 8 membros",
-    features: ["3 equipes", "Até 20 membros", "Assinatura digital", "Histórico completo", "Chat com IA"],
+    features: ["3 equipes", "Até 20 membros", "Assinatura digital", "Histórico 30 dias", "Chat com IA"],
     cta: "Começar trial",
     priceKeyMonthly: "basico_mensal",
     priceKeyAnnual: "basico_anual",
@@ -58,25 +58,12 @@ const plans: Plan[] = [
       "Resumo por IA",
       "Painel do gestor",
       "Notas privadas",
-      "Chat com IA",
+      "Histórico ilimitado",
     ],
     cta: "Começar trial",
     popular: true,
     priceKeyMonthly: "equipe_mensal",
     priceKeyAnnual: "equipe_anual",
-  },
-  {
-    name: "Profissional",
-    tagline: "Para operações complexas",
-    priceMonthly: "289",
-    priceAnnual: "2.880",
-    priceAnnualFull: "3.468",
-    annualEquivalent: "240",
-    seats: "Até 50 membros",
-    features: ["Multi-filial", "Membros ilimitados", "Alertas de IA", "Exportação PDF", "Relatórios avançados", "Suporte prioritário"],
-    cta: "Começar trial",
-    priceKeyMonthly: "profissional_mensal",
-    priceKeyAnnual: "profissional_anual",
   },
 ];
 
@@ -139,7 +126,7 @@ export function PricingSection() {
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
           {plans.map((plan) => {
             const gratis = plan.priceMonthly === "0";
             return (
@@ -218,10 +205,10 @@ export function PricingSection() {
           })}
         </div>
 
-        <p className="mt-10 text-center text-sm text-gray-600">
-          Enterprise com SLA e suporte dedicado.{" "}
-          <Link to="/contato" className="font-semibold text-app-600 hover:underline">
-            Fale com a gente
+        <p className="mt-10 text-center text-xs text-gray-400">
+          Precisa de mais?{" "}
+          <Link to="/contato" className="text-gray-500 hover:underline">
+            Entre em contato
           </Link>
         </p>
       </div>

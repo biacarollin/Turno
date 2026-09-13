@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, CalendarDays, Check, X } from "lucide-react";
+import { Plus, Trash2, CalendarDays, Check, X, Repeat } from "lucide-react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useFolgas, useCriarFolga, useAtualizarStatusFolga, useExcluirFolga } from "@/stores/folgas";
+import { useFolgas, useCriarFolga, useAtualizarStatusFolga, useExcluirFolga, type Folga } from "@/stores/folgas";
 import { useMembros } from "@/stores/equipe";
 import { useSession, useMinhasEquipes } from "@/hooks/use-session";
+import { formatDataBR } from "@/lib/data";
 
 export const Route = createFileRoute("/app/folgas")({ component: Folgas });
 
@@ -29,7 +30,9 @@ function Folgas() {
   const excluir = useExcluirFolga();
 
   const [open, setOpen] = useState(false);
+  const [tipo, setTipo] = useState<"folga" | "troca">("folga");
   const [membroId, setMembroId] = useState<string>("");
+  const [membroTrocaId, setMembroTrocaId] = useState<string>("");
   const [inicio, setInicio] = useState("");
   const [fim, setFim] = useState("");
   const [motivo, setMotivo] = useState("");
@@ -37,30 +40,46 @@ function Folgas() {
   const nomeMembro = (id: string | null) =>
     membros.find((m) => m.id === id)?.nome || "—";
 
+  const abrirNova = () => {
+    setTipo("folga"); setMembroId(""); setMembroTrocaId("");
+    setInicio(""); setFim(""); setMotivo("");
+    setOpen(true);
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inicio || !fim) return;
+    if (tipo === "troca" && (!membroId || !membroTrocaId)) {
+      toast.error("Escolha os dois membros da troca");
+      return;
+    }
+    if (tipo === "troca" && membroId === membroTrocaId) {
+      toast.error("Escolha membros diferentes para a troca");
+      return;
+    }
     try {
       await criar.mutateAsync({
+        tipo,
         membro_id: membroId || null,
+        membro_troca_id: tipo === "troca" ? membroTrocaId : null,
         data_inicio: inicio,
         data_fim: fim,
         motivo,
+        status: "aprovada", // registrado direto pelo gestor
       });
-      toast.success("Folga registrada");
+      toast.success(tipo === "troca" ? "Troca registrada" : "Folga registrada");
       setOpen(false);
-      setMembroId(""); setInicio(""); setFim(""); setMotivo("");
     } catch (e) { toast.error(e instanceof Error ? e.message : "Erro"); }
   };
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <PageHeader
-        title="Folgas"
-        subtitle="Registre e acompanhe folgas da equipe."
+        title="Folgas e trocas"
+        subtitle="Registre folgas, acompanhe trocas de turno e aprove solicitações da equipe."
         actions={
-          <Button className="bg-app-900 hover:bg-app-800" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4" /> Nova folga
+          <Button className="bg-app-900 hover:bg-app-800" onClick={abrirNova}>
+            <Plus className="h-4 w-4" /> Nova folga ou troca
           </Button>
         }
       />
@@ -71,11 +90,13 @@ function Folgas() {
         <Card className="p-10 text-center">
           <CalendarDays className="mx-auto h-10 w-10 text-muted-foreground/40" />
           <h3 className="mt-3 text-base font-medium">Nenhuma folga registrada</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Quando alguém pedir folga, registre aqui.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Quando alguém pedir folga ou troca de turno, aparece aqui pra você aprovar.
+          </p>
         </Card>
       ) : (
         <Card className="divide-y">
-          {folgas.map((f) => (
+          {folgas.map((f: Folga) => (
             <div key={f.id} className="flex items-center justify-between px-4 py-3 text-sm">
               <div>
                 <div className="flex items-center gap-2">
@@ -85,10 +106,17 @@ function Folgas() {
                   >
                     {f.status}
                   </Badge>
-                  <span className="font-medium">{nomeMembro(f.membro_id)}</span>
+                  {f.tipo === "troca" ? (
+                    <span className="inline-flex items-center gap-1 font-medium">
+                      <Repeat className="h-3.5 w-3.5 text-app-600" />
+                      {nomeMembro(f.membro_id)} ⇄ {nomeMembro(f.membro_troca_id)}
+                    </span>
+                  ) : (
+                    <span className="font-medium">{nomeMembro(f.membro_id)}</span>
+                  )}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {new Date(f.data_inicio).toLocaleDateString("pt-BR")} – {new Date(f.data_fim).toLocaleDateString("pt-BR")}
+                  {formatDataBR(f.data_inicio)} – {formatDataBR(f.data_fim)}
                   {f.motivo && ` · ${f.motivo}`}
                 </div>
               </div>
@@ -117,11 +145,22 @@ function Folgas() {
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Nova folga</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Nova folga ou troca</DialogTitle></DialogHeader>
           <form onSubmit={submit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Tipo</Label>
+              <Select value={tipo} onValueChange={(v) => setTipo(v as "folga" | "troca")}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="folga">Folga</SelectItem>
+                  <SelectItem value="troca">Troca de turno</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             {membros.length > 0 && (
               <div className="space-y-1.5">
-                <Label>Membro</Label>
+                <Label>{tipo === "troca" ? "Quem está saindo do turno" : "Membro"}</Label>
                 <Select value={membroId} onValueChange={setMembroId}>
                   <SelectTrigger><SelectValue placeholder="Escolha um membro" /></SelectTrigger>
                   <SelectContent>
@@ -132,6 +171,21 @@ function Folgas() {
                 </Select>
               </div>
             )}
+
+            {tipo === "troca" && membros.length > 0 && (
+              <div className="space-y-1.5">
+                <Label>Quem está entrando no lugar</Label>
+                <Select value={membroTrocaId} onValueChange={setMembroTrocaId}>
+                  <SelectTrigger><SelectValue placeholder="Escolha o outro membro" /></SelectTrigger>
+                  <SelectContent>
+                    {membros.filter((m) => m.id !== membroId).map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="i">Início</Label>

@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useSession } from "@/hooks/use-session";
+import { demoNovoId, demoStore } from "@/lib/demo-store";
 
 export type Ocorrencia = {
   id: string;
@@ -15,25 +14,25 @@ export type Ocorrencia = {
   created_at: string;
 };
 
+// MODO DEMO (gravação de portfólio): lê/escreve em src/lib/demo-store.ts
+// em vez de bater no Supabase (chave inválida no .env — 401 em tudo).
+// Reverter pra chamar o Supabase de novo quando a chave for corrigida
+// (procure "MODO DEMO" neste arquivo).
+
 export function useOcorrencias(equipe_id?: string) {
   return useQuery({
     queryKey: ["ocorrencias", equipe_id],
     enabled: !!equipe_id,
     queryFn: async (): Promise<Ocorrencia[]> => {
-      const { data, error } = await supabase
-        .from("ocorrencias")
-        .select("id, equipe_id, criado_por, titulo, descricao, tipo, gravidade, status, local, created_at")
-        .eq("equipe_id", equipe_id!)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as Ocorrencia[];
+      return demoStore.ocorrencias
+        .filter((o) => o.equipe_id === equipe_id)
+        .sort((a, b) => b.created_at.localeCompare(a.created_at));
     },
   });
 }
 
 export function useCriarOcorrencia() {
   const qc = useQueryClient();
-  const { data: sessao } = useSession();
   return useMutation({
     mutationFn: async (input: {
       equipe_id: string;
@@ -43,18 +42,18 @@ export function useCriarOcorrencia() {
       gravidade: "baixa" | "media" | "alta";
       local?: string;
     }) => {
-      if (!sessao?.user_id) throw new Error("Não autenticado");
-      const { error } = await supabase.from("ocorrencias").insert({
+      demoStore.ocorrencias.unshift({
+        id: demoNovoId("ocorrencia"),
         equipe_id: input.equipe_id,
-        criado_por: sessao.user_id,
-        user_id: sessao.user_id,
+        criado_por: null,
         titulo: input.titulo,
         descricao: input.descricao || null,
         tipo: input.tipo || null,
         gravidade: input.gravidade,
+        status: "aberta",
         local: input.local || null,
+        created_at: new Date().toISOString(),
       });
-      if (error) throw error;
     },
     onSuccess: (_, vars) =>
       qc.invalidateQueries({ queryKey: ["ocorrencias", vars.equipe_id] }),
@@ -73,11 +72,8 @@ export function useAtualizarStatusOcorrencia() {
       status: "aberta" | "concluida";
       equipe_id: string;
     }) => {
-      const { error } = await supabase
-        .from("ocorrencias")
-        .update({ status })
-        .eq("id", id);
-      if (error) throw error;
+      const alvo = demoStore.ocorrencias.find((o) => o.id === id);
+      if (alvo) alvo.status = status;
       return equipe_id;
     },
     onSuccess: (equipe_id) =>
@@ -95,11 +91,7 @@ export function useExcluirOcorrencia() {
       id: string;
       equipe_id: string;
     }) => {
-      const { error } = await supabase
-        .from("ocorrencias")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
+      demoStore.ocorrencias = demoStore.ocorrencias.filter((o) => o.id !== id);
       return equipe_id;
     },
     onSuccess: (equipe_id) =>

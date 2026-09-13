@@ -131,8 +131,8 @@ function Plano() {
         <h3 className="text-sm font-medium text-turno-900">
           {isPago ? "Trocar de plano" : "Escolher um plano"}
         </h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {PLANOS.filter((p) => p.id !== "gratis" && !p.sobConsulta).map((p) => {
+        <div className="grid gap-4 md:grid-cols-2">
+          {PLANOS.filter((p) => p.id === "basico" || p.id === "equipe").map((p) => {
             const ativo = p.id === planoAtivoId;
             const priceKey = `${p.id}_mensal`;
             return (
@@ -181,26 +181,17 @@ function Plano() {
               </Card>
             );
           })}
-
-          {/* Enterprise */}
-          <Card className="p-4">
-            <div className="text-base font-medium">Enterprise</div>
-            <div className="mt-1 text-2xl font-medium">Sob consulta</div>
-            <div className="text-xs text-muted-foreground">Acima de 50 membros</div>
-            <ul className="mt-3 space-y-1.5 text-sm text-turno-900/80">
-              <li className="flex items-start gap-2"><span className="mt-0.5 text-turno-600">✓</span> Multi-unidade ilimitada</li>
-              <li className="flex items-start gap-2"><span className="mt-0.5 text-turno-600">✓</span> SSO corporativo</li>
-              <li className="flex items-start gap-2"><span className="mt-0.5 text-turno-600">✓</span> SLA contratual</li>
-            </ul>
-            <Button
-              variant="outline"
-              className="mt-4 w-full border-turno-300"
-              onClick={() => window.open("mailto:contato@turnoai.com.br?subject=Enterprise", "_blank")}
-            >
-              Falar com a equipe
-            </Button>
-          </Card>
         </div>
+        <p className="text-center text-xs text-muted-foreground">
+          Precisa de mais?{" "}
+          <button
+            type="button"
+            className="text-turno-600 hover:underline"
+            onClick={() => window.open("mailto:contato@turnoai.com.br?subject=Plano sob consulta", "_blank")}
+          >
+            Entre em contato
+          </button>
+        </p>
       </div>
 
       {/* Ações do plano pago */}

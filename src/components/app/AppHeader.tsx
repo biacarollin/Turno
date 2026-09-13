@@ -50,11 +50,20 @@ export function AppHeader() {
     .join("")
     .toUpperCase();
 
+  // MODO DEMO (gravação de portfólio): /login hoje pula direto pro
+  // dashboard (bypass), então sair por lá formaria um loop. Manda pra
+  // /onboarding — que também está sem checagem de sessão — pra simular
+  // "encerrar conta e abrir uma empresa nova". Reverter pra "/login" quando
+  // o Supabase voltar a funcionar de verdade (procure "MODO DEMO").
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // sem sessão real no modo demo — ignora
+    }
     qc.clear();
     toast.success("Sessão encerrada");
-    navigate({ to: "/login" });
+    navigate({ to: "/onboarding" });
   };
 
   const marcarTodasComoLidas = () => {

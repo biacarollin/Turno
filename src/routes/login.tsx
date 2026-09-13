@@ -12,14 +12,17 @@ export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Entrar · Turno" }] }),
 });
 
-function GoogleButton({ label }: { label: string }) {
+function GoogleButton({ label, redirectPath }: { label: string; redirectPath: string }) {
   const [loading, setLoading] = useState(false);
   const handleGoogle = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/app",
+        redirectTo: window.location.origin + redirectPath,
+        // Sem isso, o Google pula a tela de escolha se já houver uma conta
+        // ativa no navegador — força sempre mostrar o seletor de contas.
+        queryParams: { prompt: "select_account" },
       },
     });
     if (error) {
@@ -63,6 +66,18 @@ function Login() {
   const [celular, setCelular] = useState("");
   const [signupSenha, setSignupSenha] = useState("");
 
+  // Convite pendente (veio do /confirmar) — se existir, login e cadastro
+  // devem terminar de volta em /confirmar, nunca em /app direto, senão a
+  // pessoa cai no onboarding e cria uma organização nova em vez de entrar
+  // na equipe pra qual foi convidada.
+  const [inviteEquipeId, setInviteEquipeId] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState<string | null>(null);
+
+  const destinoAposLogin = (equipeId: string | null, email: string | null) =>
+    equipeId
+      ? `/confirmar?invite=${encodeURIComponent(equipeId)}${email ? `&email=${encodeURIComponent(email)}` : ""}`
+      : "/app";
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -72,17 +87,30 @@ function Login() {
       url.searchParams.delete("excluida");
       window.history.replaceState({}, "", url.toString());
     }
+
+    const invite = params.get("invite");
+    const email = params.get("email");
+    if (invite) {
+      setInviteEquipeId(invite);
+      setInviteEmail(email);
+      setTab("cadastrar");
+      if (email) {
+        setSignupEmail(email);
+        setLoginEmail(email);
+      }
+    }
   }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/app" });
+      if (data.session) window.location.href = destinoAposLogin(inviteEquipeId, inviteEmail);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate({ to: "/app" });
+      if (session) window.location.href = destinoAposLogin(inviteEquipeId, inviteEmail);
     });
     return () => subscription.unsubscribe();
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inviteEquipeId, inviteEmail]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,7 +129,7 @@ function Login() {
       return;
     }
     toast.success("Bem-vindo!");
-    navigate({ to: "/app" });
+    window.location.href = destinoAposLogin(inviteEquipeId, inviteEmail);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -115,7 +143,7 @@ function Login() {
       email: signupEmail.trim(),
       password: signupSenha,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`,
+        emailRedirectTo: `${window.location.origin}${destinoAposLogin(inviteEquipeId, inviteEmail)}`,
         data: { nome_completo: nome.trim(), celular },
       },
     });
@@ -193,6 +221,12 @@ function Login() {
             <Logo />
           </div>
 
+          {inviteEquipeId && (
+            <div className="mb-5 rounded-lg border border-app-200 bg-app-50 px-3 py-2 text-[11px] text-app-800">
+              Você foi convidado para uma equipe — crie sua conta (ou entre, se já tiver) para confirmar.
+            </div>
+          )}
+
           {tab === "entrar" ? (
             <>
               <h2 className="text-[19px] font-medium tracking-tight text-gray-900">
@@ -201,7 +235,7 @@ function Login() {
               <p className="mt-1 text-xs text-gray-500">Entre na sua conta para continuar.</p>
 
               <div className="mt-6">
-                <GoogleButton label="Continuar com Google" />
+                <GoogleButton label="Continuar com Google" redirectPath={destinoAposLogin(inviteEquipeId, inviteEmail)} />
               </div>
 
               <div className="relative my-5">
@@ -266,7 +300,7 @@ function Login() {
               <p className="mt-1 text-xs text-gray-500">Comece grátis, sem cartão de crédito.</p>
 
               <div className="mt-6">
-                <GoogleButton label="Cadastrar com Google" />
+                <GoogleButton label="Cadastrar com Google" redirectPath={destinoAposLogin(inviteEquipeId, inviteEmail)} />
               </div>
 
               <div className="relative my-5">

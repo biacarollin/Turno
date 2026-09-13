@@ -226,8 +226,10 @@ export type Database = {
           filial_id: string | null
           id: string
           membro_id: string | null
+          membro_troca_id: string | null
           motivo: string | null
           status: string
+          tipo: string
           user_id: string
         }
         Insert: {
@@ -237,8 +239,10 @@ export type Database = {
           filial_id?: string | null
           id?: string
           membro_id?: string | null
+          membro_troca_id?: string | null
           motivo?: string | null
           status?: string
+          tipo?: string
           user_id: string
         }
         Update: {
@@ -248,8 +252,10 @@ export type Database = {
           filial_id?: string | null
           id?: string
           membro_id?: string | null
+          membro_troca_id?: string | null
           motivo?: string | null
           status?: string
+          tipo?: string
           user_id?: string
         }
         Relationships: [
@@ -272,33 +278,39 @@ export type Database = {
       membros_equipe: {
         Row: {
           cargo_id: string | null
+          convite_email: string | null
+          convite_nome: string | null
           created_at: string
           dispositivo: string
           equipe_id: string
           id: string
           turno_nome: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           cargo_id?: string | null
+          convite_email?: string | null
+          convite_nome?: string | null
           created_at?: string
           dispositivo?: string
           equipe_id: string
           id?: string
           turno_nome?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           cargo_id?: string | null
+          convite_email?: string | null
+          convite_nome?: string | null
           created_at?: string
           dispositivo?: string
           equipe_id?: string
           id?: string
           turno_nome?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

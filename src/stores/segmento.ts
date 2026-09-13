@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/use-session";
 import { SEGMENTOS, type Subcategoria } from "@/lib/segmentos";
+import { demoStore } from "@/lib/demo-store";
 
 export type ConfigurarInput = {
   topoId: string;
@@ -108,19 +109,14 @@ export function useConfigurarSegmento() {
   });
 }
 
+// MODO DEMO (gravação de portfólio): lê de src/lib/demo-store.ts em vez de
+// bater no Supabase. Reverter pra chamar o Supabase de novo quando a chave
+// for corrigida (procure "MODO DEMO" neste arquivo).
 export function useTiposOcorrencia(filial_id?: string) {
   return useQuery({
     queryKey: ["tipos_ocorrencia", filial_id],
     enabled: !!filial_id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("tipos_ocorrencia")
-        .select("id, nome, gravidade_default")
-        .eq("filial_id", filial_id!)
-        .order("created_at", { ascending: true });
-      if (error) throw error;
-      return data ?? [];
-    },
+    queryFn: async () => demoStore.tiposOcorrencia.filter((t) => t.filial_id === filial_id),
   });
 }
 

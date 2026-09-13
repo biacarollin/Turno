@@ -66,9 +66,10 @@ function Membros() {
   const salvarConvite = async () => {
     if (validarComuns() || !equipe_id) return;
     try {
-      const membro = await adicionarMembro.mutateAsync({
+      await adicionarMembro.mutateAsync({
         equipe_id,
-        user_id: crypto.randomUUID(), // placeholder — será substituído quando o usuário aceitar o convite
+        convite_nome: novoNome.trim(),
+        convite_email: novoEmail.trim() || undefined,
         cargo_id: novoCargo === "none" ? undefined : novoCargo,
         turno_nome: novoTurno,
         dispositivo: "convite",
@@ -87,7 +88,8 @@ function Membros() {
     try {
       await adicionarMembro.mutateAsync({
         equipe_id,
-        user_id: crypto.randomUUID(),
+        convite_nome: novoNome.trim(),
+        convite_email: novoEmail.trim() || undefined,
         cargo_id: novoCargo === "none" ? undefined : novoCargo,
         turno_nome: novoTurno,
         dispositivo: "verificado",

@@ -29,7 +29,7 @@ export function Logo({
           dark ? "text-white" : "text-turno-400"
         }`}
       >
-        {dark ? "turno" : "Turno"}
+        Turno
       </span>
     </span>
   );

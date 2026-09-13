@@ -1,69 +1,38 @@
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app/AppSidebar";
 import { AppHeader } from "@/components/app/AppHeader";
-import { supabase } from "@/integrations/supabase/client";
+import { ColaboradorView } from "@/components/app/ColaboradorView";
 import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useSession } from "@/hooks/use-session";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
 });
 
 function AppLayout() {
-  const navigate = useNavigate();
-  const qc = useQueryClient();
   const [ready, setReady] = useState(false);
+  const { data: sessao } = useSession();
 
+  // BYPASS TEMPORÁRIO: chave do Supabase inválida (401) faz getSession()/
+  // profiles falhar e mandar de volta pro /login. Enquanto isso não é
+  // corrigido no .env, entra direto — useSession() já cai numa sessão fake.
+  // Reverter para o bloco original quando a chave for corrigida.
   useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!active) return;
-      if (!session) {
-        navigate({ to: "/login" });
-        return;
-      }
+    setReady(true);
+  }, []);
 
-      // Verifica se o usuário tem filial ativa (onboarding completo)
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("filial_ativa_id, segmento")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-
-      if (!active) return;
-
-      // Se não tem segmento ou filial ativa, vai para onboarding
-      if (!profile?.segmento || !profile?.filial_ativa_id) {
-        navigate({ to: "/onboarding" });
-        return;
-      }
-
-      setReady(true);
-    })();
-
-    // Listener para mudanças de sessão
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (!active) return;
-      if (event === "SIGNED_OUT") {
-        qc.clear();
-        navigate({ to: "/login" });
-      }
-    });
-
-    return () => {
-      active = false;
-      subscription.unsubscribe();
-    };
-  }, [navigate, qc]);
-
-  if (!ready) {
+  if (!ready || !sessao) {
     return (
       <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
         Carregando...
       </div>
     );
+  }
+
+  // Colaborador tem uma tela própria e simples — não vê o painel completo do gestor.
+  if (sessao.meu_papel === "colaborador") {
+    return <ColaboradorView />;
   }
 
   return (

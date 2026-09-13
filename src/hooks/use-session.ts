@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { DEMO_EQUIPE_ID, DEMO_FILIAL_ID, DEMO_ORG_ID, DEMO_USER_ID } from "@/lib/demo-store";
 
 export type Papel = "admin" | "gestor" | "colaborador";
 
@@ -32,21 +32,31 @@ export type MinhaEquipe = {
   equipe_nome: string;
 };
 
+// MODO DEMO (gravação de portfólio): chave do Supabase inválida (401) faz
+// getUser()/minha_sessao falhar sempre. Enquanto isso não é corrigido no
+// .env, useSession/useMinhasFiliais/useMinhasEquipes/trocarFilial retornam
+// dados fixos de src/lib/demo-store.ts em vez de bater no Supabase — assim
+// o app inteiro navega e funciona offline. Reverter pra chamar o Supabase
+// de novo quando a chave for corrigida (procure "MODO DEMO" neste arquivo).
+const SESSAO_DEMO: Sessao = {
+  user_id: DEMO_USER_ID,
+  nome_completo: "Ana Beatriz Souza",
+  email: "ana.souza@exemplo.com",
+  username: "anasouza",
+  filial_ativa_id: DEMO_FILIAL_ID,
+  filial_nome: "Hospital São Lucas",
+  filial_codigo: "HSL",
+  segmento: "enfermagem",
+  segmento_topo: "saude",
+  meu_papel: "gestor",
+  org_nome: "Hospital São Lucas",
+  org_id: DEMO_ORG_ID,
+};
+
 export function useSession() {
   return useQuery({
     queryKey: ["sessao"],
-    queryFn: async (): Promise<Sessao | null> => {
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) return null;
-
-      const { data, error } = await supabase
-        .from("minha_sessao")
-        .select("*")
-        .single();
-
-      if (error) throw error;
-      return data as Sessao;
-    },
+    queryFn: async (): Promise<Sessao | null> => SESSAO_DEMO,
     staleTime: 1000 * 60 * 5,
   });
 }
@@ -54,43 +64,30 @@ export function useSession() {
 export function useMinhasFiliais() {
   return useQuery({
     queryKey: ["minhas_filiais"],
-    queryFn: async (): Promise<MinhaFilial[]> => {
-      const { data, error } = await supabase
-        .from("minhas_filiais")
-        .select("*");
-      if (error) throw error;
-      return (data ?? []) as MinhaFilial[];
-    },
+    queryFn: async (): Promise<MinhaFilial[]> => [
+      {
+        id: DEMO_FILIAL_ID,
+        nome: SESSAO_DEMO.filial_nome!,
+        codigo: SESSAO_DEMO.filial_codigo!,
+        segmento_topo: SESSAO_DEMO.segmento_topo,
+        papel: "gestor",
+        org_nome: SESSAO_DEMO.org_nome!,
+      },
+    ],
   });
 }
 
 export function useMinhasEquipes() {
   return useQuery({
     queryKey: ["minhas_equipes"],
-    queryFn: async (): Promise<MinhaEquipe[]> => {
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) return [];
-
-      const { data, error } = await supabase
-        .from("membros_equipe")
-        .select("equipe_id, equipes(nome)")
-        .eq("user_id", auth.user.id);
-
-      if (error) throw error;
-
-      return (data ?? []).map((item) => ({
-        equipe_id: item.equipe_id,
-        equipe_nome: (item.equipes as { nome: string } | null)?.nome ?? "Equipe",
-      }));
-    },
+    queryFn: async (): Promise<MinhaEquipe[]> => [
+      { equipe_id: DEMO_EQUIPE_ID, equipe_nome: "Equipe Enfermagem" },
+    ],
   });
 }
 
-export async function trocarFilial(filial_id: string): Promise<void> {
-  const { error } = await supabase.rpc("trocar_filial", {
-    p_filial_id: filial_id,
-  });
-  if (error) throw error;
+export async function trocarFilial(_filial_id: string): Promise<void> {
+  // MODO DEMO: só existe uma filial fake, não há o que trocar.
 }
 
 export function useIsAdmin() {

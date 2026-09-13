@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { SEGMENTOS, type Subcategoria } from "@/lib/segmentos";
 import { useConfigurarSegmento } from "@/stores/segmento";
 import { Card } from "@/components/ui/card";
@@ -32,29 +31,13 @@ function OnboardingPage() {
   const [turnos, setTurnos] = useState<Subcategoria["turnosSugeridos"]>([]);
   const [tipos, setTipos] = useState<Subcategoria["tiposOcorrencia"]>([]);
 
-  // Verifica se já tem onboarding completo
+  // BYPASS TEMPORÁRIO: chave do Supabase inválida (401 em qualquer chamada)
+  // faz getSession()/profiles falhar e mandar de volta pro /login. Enquanto
+  // isso não é corrigido no .env, pula a checagem e mostra o wizard direto.
+  // Reverter para o bloco original quando a chave for corrigida.
   useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!active) return;
-      if (!session) { navigate({ to: "/login" }); return; }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("filial_ativa_id, segmento")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-
-      if (!active) return;
-      if (profile?.segmento && profile?.filial_ativa_id) {
-        navigate({ to: "/app" });
-        return;
-      }
-      setLoading(false);
-    })();
-    return () => { active = false; };
-  }, [navigate]);
+    setLoading(false);
+  }, []);
 
   const topo = useMemo(() => SEGMENTOS.find((t) => t.id === topoId) ?? null, [topoId]);
   const sub = useMemo(() => topo?.subs.find((s) => s.id === subId) ?? null, [topo, subId]);
