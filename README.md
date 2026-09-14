@@ -4,6 +4,8 @@ Plataforma de gestão de passagem de turno para equipes que trabalham em regime 
 
 Projeto de portfólio desenvolvido de forma independente com auxílio de IA.
 
+![Demonstração do Turno](docs/design/media/demo.gif)
+
 ## O problema
 
 Equipes em rodízio perdem informação na troca de turno. Uma ocorrência não comunicada vira retrabalho ou acidente. WhatsApp não tem rastreabilidade, papel não tem busca, planilha não tem assinatura.
