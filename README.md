@@ -75,7 +75,6 @@ Limites de equipes, membros e histórico aplicados via migration. Não tem como 
 | Multi-filial | Não implementado |
 | App mobile nativo | Não implementado |
 | Exportação PDF | Não implementado |
-| Testes E2E com Cypress | Em andamento |
 
 ## Segmentos
 
@@ -87,4 +86,4 @@ Processo completo de testes, casos documentados e bugs encontrados em [turno-qa-
 
 ---
 
-Feito por biacarollin 🖤
+Feito por biacarollin 🤖
