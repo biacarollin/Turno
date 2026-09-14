@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
@@ -26,14 +27,16 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       throw new Error("Plano não encontrado");
     }
 
+    const origin = new URL(getRequest().url).origin;
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: prices.data[0].id, quantity: 1 }],
       subscription_data: { trial_period_days: 7 },
       client_reference_id: userId,
-      success_url: `https://turnoai.com.br/app?checkout=success`,
-      cancel_url: `https://turnoai.com.br/precos?checkout=cancelled`,
+      success_url: `${origin}/app?checkout=success`,
+      cancel_url: `${origin}/precos?checkout=cancelled`,
       locale: "pt-BR",
     });
 

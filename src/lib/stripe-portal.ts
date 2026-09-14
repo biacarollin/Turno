@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const criarPortalStripe = createServerFn({ method: "POST" })
@@ -28,9 +29,11 @@ export const criarPortalStripe = createServerFn({ method: "POST" })
       throw new Error("Nenhuma assinatura encontrada para este usuário");
     }
 
+    const origin = new URL(getRequest().url).origin;
+
     const session = await stripe.billingPortal.sessions.create({
       customer: data.stripe_customer_id,
-      return_url: "https://turnoai.com.br/app/plano",
+      return_url: `${origin}/app/plano`,
     });
 
     return { url: session.url };

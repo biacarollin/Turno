@@ -56,7 +56,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-3 border-t border-gray-800 pt-6 sm:flex-row">
           <span className="text-[11px] text-gray-600">
-            © {year} Turno · turnoai.com.br
+            © {year} Turno
           </span>
           <span className="text-[11px] text-gray-600">Feito com ♥ no Brasil</span>
         </div>

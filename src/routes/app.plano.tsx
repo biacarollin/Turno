@@ -187,7 +187,7 @@ function Plano() {
           <button
             type="button"
             className="text-turno-600 hover:underline"
-            onClick={() => window.open("mailto:contato@turnoai.com.br?subject=Plano sob consulta", "_blank")}
+            onClick={() => window.open("mailto:contato@turno.app?subject=Plano sob consulta", "_blank")}
           >
             Entre em contato
           </button>
