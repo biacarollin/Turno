@@ -26,6 +26,8 @@ crítico, múltiplas pendências (`98:*` / `96:1xx` na mesma página).
 ## Estrutura por tela
 
 ### 1 · Login (fundo escuro `#0F1E15`)
+
+![Tela de login](images/1 · Login.png)
 - Logo "Turno" (grade de 9 pontos verdes) centralizada, título "Bem-vindo de volta"
 - Botão "Continuar com Google" (outline, `app-800` bg, `app-600` border)
 - Divisor "ou"
@@ -35,6 +37,11 @@ crítico, múltiplas pendências (`98:*` / `96:1xx` na mesma página).
 - Rodapé "Não tem conta? Cadastre-se"
 
 ### 2 · Turno Ativo (home, fundo `gray-50`)
+
+![Estado: múltiplas pendências](images/2a Inicio · Múltiplas pendências.png)
+![Estado: crítico](images/2b · Início (Crítico).png)
+![Estado: urgência média](images/2c · Início (Urgência média).png)
+![Estado: sem pendências](images/2d · Início (Sem pendências).png)
 - Header branco fixo: logo "turno" + ícone de notificação
 - Saudação "Bom turno, {nome} 👋" + linha "Equipe · Filial · horário"
 - Card "Passagem de plantão" (dark, `gray-900`/`#111827`): badge "✦ Passagem de plantão", quem passou o plantão, badge "✦ IA" com resumo gerado automaticamente
@@ -44,10 +51,15 @@ crítico, múltiplas pendências (`98:*` / `96:1xx` na mesma página).
 - Tab bar inferior fixa: Início · Ocorrências · Histórico · Perfil (ativo = verde `app-500` + indicador de 3px no topo do ícone)
 
 ### 3 · Registrar Ocorrência
+
+![Registrar ocorrência](images/3 · Registrar Ocorrência.png)
 - Header com voltar (←) + título centralizado
 - Formulário simples (tipo, gravidade, descrição) seguindo os mesmos padrões de cor de gravidade do dashboard (alta = âmbar, média = laranja, rotina/baixa = verde)
 
 ### 4 · Registrar Passagem / Assinar Turno
+
+![Registrar passagem, resumo editável](images/4 · Registrar Passagem.png)
+![Assinar turno com PIN](images/5 · Assinar Turno.png)
 - Header "Registrar passagem" com contexto da equipe/turno em pill cinza
 - Lista "Ocorrências do turno": cada item com barra lateral colorida por gravidade + badge (igual ao padrão do dashboard web)
 - Card "Resumo gerado pela IA" (bg `app-50`, border `app-200`, badge "✦ IA" em `app-600`) — texto gerado automaticamente, não editável
@@ -58,12 +70,18 @@ crítico, múltiplas pendências (`98:*` / `96:1xx` na mesma página).
 - **Importante (CLAUDE.md):** a assinatura em si deve ocorrer pelo site, não dentro do app, para evitar a taxa de 30% do Google Play Billing — este fluxo de PIN é sobre *confirmar identidade*, o encerramento/registro formal da passagem segue as mesmas regras de `passagens_turno` já usadas no web (hash + IP + device).
 
 ### 5 · Histórico
+
+![Histórico de passagens](images/4 · Histórico de passagens.png)
 - Lista de passagens do próprio colaborador, mesmo padrão visual do dashboard (data, status assinado/pendente)
 
 ### 6 · Solicitar Folga
+
+![Solicitar folga](images/6 · Solicitar Folga.png)
 - Formulário de solicitação (data, motivo, turno afetado) alimentando a tabela `folgas` já existente no backend
 
 ### 7 · Perfil
+
+![Perfil do colaborador](images/7 · Perfil.png)
 - Avatar circular com iniciais (bg `app-600`, texto `app-400`) + nome + cargo + filial + badge "● Ativo"
 - Seção "CONTA": e-mail, celular, cargo, equipe (linhas com chevron `›`)
 - Seção "CONFIGURAÇÕES": notificações, PIN de assinatura, filial ativa
