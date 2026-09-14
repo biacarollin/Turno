@@ -82,7 +82,7 @@ Saúde, logística, hotelaria e segurança. Qualquer operação com equipes em r
 
 ## QA
 
-Processo completo de testes, casos documentados e bugs encontrados em [turno-qa-suite](../../turno-qa-suite).
+Processo completo de testes, casos documentados e bugs encontrados em [turno-qa-suite](https://github.com/biacarollin/turno-qa-suite).
 
 ---
 
